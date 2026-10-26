@@ -119,8 +119,8 @@ function buildOne(M, spec) {
 export const CURTAIN_SPECS = [
   // bedroom north window 274 cm, floor length
   { id: 'bed-n', name: '主臥・落地窗', axis: 'x', range: [-156, 137], c: 0, zTop: 242, zBottom: 1.5, kind: 'wave', parent: 'N' },
-  // bedroom west window 126 cm
-  { id: 'bed-w', name: '主臥・側窗', axis: 'y', range: [49, 205], c: -157, zTop: 242, zBottom: 1.5, kind: 'wave', parent: 'W', flipC: true },
+  // bedroom west window 126 cm: slim blackout honeycomb (5 cm deep) so the bed can sit close to it
+  { id: 'bed-w', name: '主臥・側窗', axis: 'y', range: [60, 194], c: -157, zTop: 241, zBottom: 2, kind: 'honeycomb', parent: 'W' },
   // living north window 316 cm, below the A/C unit
   { id: 'liv-n', name: '客廳・落地窗', axis: 'x', range: [262.5, 597], c: 0, zTop: 214, zBottom: 1.5, kind: 'wave', parent: 'N' },
   // study north window 143 cm
