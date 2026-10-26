@@ -62,8 +62,8 @@ export function buildBedroom(M, ctx) {
   g.add(acUnit(M, 241, 54, 90, 226));
 
   // ---- window corner: wood armchair, round table (curtains come from curtains.js)
-  g.add(woodArmchair(M, -126, 118, -Math.PI / 2));
-  g.add(sideTableRound(M, -94, 176));
-  ctx.colliders.push([-158, 88, -100, 150], [-124, 150, -62, 202]);
+  g.add(woodArmchair(M, -118, 84, -Math.PI / 2));
+  g.add(sideTableRound(M, -58, 62));
+  ctx.colliders.push([-150, 54, -86, 114], [-90, 40, -26, 86]);
   return g;
 }
