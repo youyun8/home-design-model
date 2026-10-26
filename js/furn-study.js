@@ -26,7 +26,7 @@ function officeChair(M, x, y, z, yaw) {
 }
 
 // =================================================================================================
-// 書房 (x 610..862, y 0..357, raised floor +14, ceiling 270): open shelving with LED on rose-white walls, oak wardrobe
+// 書房 (x 610..862, y 0..357, raised floor +14, ceiling 270): open shelving (dark back panel) with LED on rose-white walls, oak wardrobe
 // units on the south wall, desk and pegboard on the east wall, slat blinds on the north window
 // =================================================================================================
 export function buildStudy(M, ctx) {
@@ -34,17 +34,17 @@ export function buildStudy(M, ctx) {
   g.name = 'study-furniture';
   const F = 14, BY0 = 297;
 
-  // ---- south wall: shelving (x 700..862) in front of the rose-white wall, oak boards, LED under each board
-  g.add(bx(611, 355, 862, 357, F, F + 230, { all: M.wallWhite }));
+  // ---- south wall: shelving (x 700..862) with a dark back panel in front of the rose-white wall, oak boards, LED under each board
+  g.add(bx(700, 355, 862, 357, F, F + 230, { all: M.charcoal }));
   g.add(bx(611, BY0, 613, 357, F, F + 230, { all: M.laminateWhite }));
-  g.add(bx(860, BY0, 862, 357, F, F + 230, { all: M.wallWhite }));
+  g.add(bx(860, BY0, 862, 357, F, F + 230, { all: M.charcoal }));
   g.add(bx(611, BY0 + 2, 862, 357, F, F + 2.5, { all: M.shadowGap }, { cast: false }));
   const shelfZ = [75, 120, 159, 198, 229].map((z) => z + F);
   shelfZ.forEach((z, i) => {
     g.add(bx(700, BY0, 861, 357, z, z + 2.2, { all: i === 0 ? M.blackCabinet : M.oak }));
     if (i < 4) g.add(led(M, 702, BY0 + 1.5, 859, BY0 + 1.5, z - 1.5, 1.2));
   });
-  [700, 748.5, 802, 858.4].forEach((x) => g.add(bx(x, BY0 + 6, x + 1.8, 357, F + 77, F + 231, { all: M.laminateWhite })));
+  [700, 748.5, 802, 858.4].forEach((x) => g.add(bx(x, BY0 + 6, x + 1.8, 357, F + 77, F + 231, { all: M.charcoal })));
   [[0, 3], [1, 4], [2, 5], [3, 6]].forEach(([i, seed]) => {
     g.add(books(M, i % 2 ? 752 : 706, i % 2 ? 858 : 800, 332, shelfZ[i] + 2.2, [28, 31, 32, 24][i], seed));
   });
