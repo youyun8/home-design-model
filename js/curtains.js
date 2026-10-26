@@ -101,8 +101,9 @@ function buildOne(M, spec) {
     const rail = axis === 'x' ? cbox(w + 1, 5.4, 5, M.trackWhite) : cbox(5.4, w + 1, 5, M.trackWhite);
     rail.position.set(axis === 'x' ? ((lo + hi) / 2) * CM : (c + 2.7) * CM, (zTop + 2.5) * CM, axis === 'x' ? (c + 2.7) * CM : ((lo + hi) / 2) * CM);
     rail.castShadow = true; g.add(rail);
-    const bottom = axis === 'x' ? cbox(w - 0.6, 2.6, 1.8, M.trackWhite) : cbox(2.6, w - 0.6, 1.8, M.trackWhite);
-    place(bottom, (lo + hi) / 2, zTop, 1.8); bottom.rotation.y = axis === 'x' ? 0 : -Math.PI / 2; g.add(bottom);
+    // built along local x; place() rotates it onto side walls (axis 'y') together with the shade itself
+    const bottom = cbox(w - 0.6, 2.6, 1.8, M.trackWhite);
+    place(bottom, (lo + hi) / 2, zTop, 1.8); g.add(bottom);
     // two thin side channels
     [lo - 0.2, hi - 1.0].forEach((u) => {
       const ch = axis === 'x' ? cbox(1.2, 2.6, h, M.trackWhite) : cbox(2.6, 1.2, h, M.trackWhite);
