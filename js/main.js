@@ -35,12 +35,13 @@ const progress = (label, r) => { loaderText.textContent = `建立中：${label}`
 async function boot() {
   const canvas = document.getElementById('view');
   const coarse = matchMedia('(pointer: coarse)').matches;
-  const qKey = QUALITY[params.get('q')] ? params.get('q') : (coarse ? 'low' : 'high');
+  const explicitQ = !!QUALITY[params.get('q')];
+  const qKey = explicitQ ? params.get('q') : (coarse ? 'low' : (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4 ? 'medium' : 'high'));
   const quality = { ...QUALITY[qKey] };
 
   let renderer;
   try {
-    renderer = new THREE.WebGLRenderer({ canvas, antialias: quality.msaa === 0, powerPreference: 'high-performance', preserveDrawingBuffer: params.has('shot') });
+    renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance', preserveDrawingBuffer: params.has('shot') });
   } catch (e) {
     loaderText.textContent = '此瀏覽器無法啟用 WebGL，請改用較新的 Chrome / Edge / Safari / Firefox。';
     throw e;
@@ -80,7 +81,12 @@ async function boot() {
   Object.values(app.furniture.rooms).forEach((g) => mergeStatic(g));
 
   // ---- post processing -------------------------------------------------------------------
-  let composer, bloom = null, gtao = null;
+  let composer = null, bloom = null, gtao = null;
+  const glassMeshes = [];
+  scene.traverse((o) => {
+    const m = o.isMesh && !Array.isArray(o.material) ? o.material : null;
+    if (m && m.transparent && m.depthWrite === false && m.opacity < 0.9) glassMeshes.push(o);
+  });
   const buildComposer = () => {
     const w = innerWidth, h = innerHeight, dpr = renderer.getPixelRatio();
     const rt = new THREE.WebGLRenderTarget(w * dpr, h * dpr, { type: THREE.HalfFloatType, samples: quality.msaa });
@@ -93,6 +99,14 @@ async function boot() {
       gtao.updateGtaoMaterial({ radius: 0.5, distanceExponent: 1.4, thickness: 1.2, scale: 1.0, samples: 12, distanceFallOff: 1.0, screenSpaceRadius: false });
       gtao.updatePdMaterial({ lumaPhi: 10, depthPhi: 2, normalPhi: 3, radius: 6, radiusExponent: 1, rings: 2, samples: 12 });
       gtao.blendIntensity = 0.9;
+      // glass / curtains must not occlude in the AO pass (they would darken the sky seen through windows)
+      const aoRender = gtao.render.bind(gtao);
+      gtao.render = (...a) => {
+        const vis = glassMeshes.map((m) => m.visible);
+        glassMeshes.forEach((m) => { m.visible = false; });
+        aoRender(...a);
+        glassMeshes.forEach((m, i) => { m.visible = vis[i]; });
+      };
       composer.addPass(gtao);
     }
     if (quality.bloom) {
@@ -101,13 +115,32 @@ async function boot() {
     }
     composer.addPass(new OutputPass());
   };
-  buildComposer();
+  if (quality.ao || quality.bloom) buildComposer();
   app.composer = composer;
+
+  // runtime quality switch (also used by the automatic frame-rate guard)
+  const toast = (msg) => {
+    const t = document.getElementById('toast'); if (!t) return;
+    t.textContent = msg; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => { t.hidden = true; }, 4200);
+  };
+  app.applyQuality = (key, { silent } = {}) => {
+    const q = QUALITY[key]; if (!q) return;
+    Object.assign(quality, q); app.qKey = key;
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, q.dpr));
+    renderer.setSize(innerWidth, innerHeight, false);
+    lighting.setShadowSize(q.shadow);
+    if (composer) { composer.dispose(); composer = null; bloom = null; gtao = null; }
+    if (q.ao || q.bloom) buildComposer();
+    app.composer = composer;
+    const sel = document.getElementById('sel-quality'); if (sel) sel.value = key;
+    if (!silent) toast(`畫質：${{ high: '高', medium: '中', low: '省電' }[key]}`);
+  };
 
   // ---- navigation, UI, interaction ----------------------------------------------------------
   const nav = new Navigator({ camera, canvas, app });
   app.nav = nav;
   nav.bindJoystick(document.getElementById('joystick'));
+  nav.baseFov = 48; nav.applyFov();
   const ui = setupUI(app, nav);
   app.ui = ui;
   setupInteraction(app, nav, ui);
@@ -144,8 +177,20 @@ async function boot() {
   // ---- loop --------------------------------------------------------------------------------
   let last = performance.now();
   app.frame = 0;
+  const guard = { t: 0, n: 0, sum: 0, warm: 0 };
   const loop = (now) => {
-    const dt = Math.min(0.05, (now - last) / 1000); last = now;
+    const raw = now - last;
+    const dt = Math.min(0.05, raw / 1000); last = now;
+    if (!explicitQ && !app.paused && raw < 400 && app.qKey !== 'low') {
+      guard.warm += raw;
+      if (guard.warm > 3000) {
+        guard.n++; guard.sum += raw;
+        if (guard.n >= 70) {
+          if (guard.sum / guard.n > 42) { app.applyQuality(app.qKey === 'high' ? 'medium' : 'low', { silent: true }); toast('偵測到畫面較卡，已自動調降畫質（可在右上角調整）'); }
+          guard.n = 0; guard.sum = 0; guard.warm = 1500;
+        }
+      }
+    }
     nav.update(dt);
     arch.doors.forEach((d) => d.update(dt));
     app.dispenser.update(dt);
@@ -153,13 +198,13 @@ async function boot() {
     ui.update(dt);
     updateVisibility();
     if (bloom) bloom.strength = lighting.bloom ?? bloom.strength;
-    if (!app.paused) { composer.render(); app.frame++; }
+    if (!app.paused) { if (composer) composer.render(); else renderer.render(scene, camera); app.frame++; }
     requestAnimationFrame(loop);
   };
   addEventListener('resize', () => {
-    camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
+    camera.aspect = innerWidth / innerHeight; app.nav.applyFov();
     renderer.setSize(innerWidth, innerHeight, false);
-    composer.setSize(innerWidth, innerHeight);
+    if (composer) composer.setSize(innerWidth, innerHeight);
   });
 
   document.getElementById('loader').classList.add('done');

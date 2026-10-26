@@ -47,7 +47,7 @@ export function setupUI(app, nav) {
     ui.showCeiling = !ui.showCeiling; e.currentTarget.setAttribute('aria-pressed', String(ui.showCeiling)); app.showCeiling = ui.showCeiling;
   });
   const sel = $('#sel-quality'); sel.value = app.qKey;
-  sel.addEventListener('change', () => { const u = new URL(location.href); u.searchParams.set('q', sel.value); location.href = u.toString(); });
+  sel.addEventListener('change', () => app.applyQuality(sel.value));
   $('#btn-help').addEventListener('click', () => $('#help').showModal());
   setSeg(timeSeg, 'time', lighting.time); syncLights();
   lighting.onChange = () => { syncLights(); app.refreshLamps?.(); };
@@ -87,7 +87,13 @@ export function setupUI(app, nav) {
 
   // ------------------------------------------------------------------------- dispenser panel
   const el = $('#dispenser-panel');
-  const panel = ui.panel = { el, pinned: false, open() { el.hidden = false; }, close() { el.hidden = true; panel.pinned = false; } };
+  const panel = ui.panel = {
+    el, pinned: false,
+    open() { el.hidden = false; document.body.classList.add('panel-open'); },
+    close() { el.hidden = true; panel.pinned = false; document.body.classList.remove('panel-open'); },
+  };
+  if (matchMedia('(max-width: 900px)').matches) el.classList.add('folded');
+  $('#dp-fold').addEventListener('click', () => el.classList.toggle('folded'));
   $('#dp-close').addEventListener('click', () => panel.close());
   const btns = $('#dp-buttons');
   let hold = null;

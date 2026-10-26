@@ -292,7 +292,7 @@ function buildUnit(M, api) {
   // heater coil, compressor, inlet solenoid valve
   const coil = new THREE.Mesh(new THREE.TorusGeometry(0.055, 0.004, 8, 40), new THREE.MeshStandardMaterial({ color: 0xff5a30, emissive: 0xff3010, emissiveIntensity: 0.0 })); coil.rotation.x = Math.PI / 2; coil.position.set(-0.065, 0.32, 0.13); internals.add(coil);
   api.coil = coil;
-  const comp = S(rbox(0, 0.0, 8, 8, 0, 6, M.blackMatte, 1, 2)); comp.position.set(0.09, 0.05, 0.12); comp.scale.setScalar(1.8); internals.add(comp);
+  const comp = S(rbox(0, 0.0, 8, 8, 0, 6, M.blackMatte, 1, 2)); comp.position.set(0.09, 0.05, 0.12); comp.scale.setScalar(1.15); internals.add(comp);
   const valve = S(new THREE.Mesh(new RoundedBoxGeometry(0.026, 0.034, 0.03, 2, 0.003), new THREE.MeshStandardMaterial({ color: 0x2f7fd6, roughness: 0.4, emissive: 0x2f7fd6, emissiveIntensity: 0.0 })));
   valve.position.set(-0.056, 0.14, 0.03); internals.add(valve); api.valve = valve;
   // internal plumbing (inlet -> valve -> tanks)
@@ -315,7 +315,7 @@ function buildUnit(M, api) {
   const cupRim = new THREE.Mesh(new THREE.TorusGeometry(0.037, 0.0016, 8, 32), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.3 })); cupRim.rotation.x = Math.PI / 2; cupRim.position.y = 0.105; cup.add(cupRim);
   cup.position.copy(api.cupPos); api.cup = { g: cup, water: cupWater, mat: cupWater.material };
   // steam sprites
-  const steamTex = canvasTex(labelCanvas(64, 64, (g, w, h) => { const gr = g.createRadialGradient(32, 32, 2, 32, 32, 30); gr.addColorStop(0, 'rgba(255,255,255,0.55)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(0, 0, w, h); }), { repeatWrap: false });
+  const steamTex = canvasTex(labelCanvas(64, 64, (g, w, h) => { const gr = g.createRadialGradient(32, 32, 2, 32, 32, 30); gr.addColorStop(0, 'rgba(255,255,255,0.9)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(0, 0, w, h); }), { repeatWrap: false });
   api.steam = [];
   for (let i = 0; i < 14; i++) {
     const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: steamTex, transparent: true, opacity: 0, depthWrite: false, toneMapped: false }));
@@ -493,8 +493,8 @@ function attachLogic(api, D, M, pipes, dyn) {
       s.sp.visible = true;
       const h = Math.min(0.1, st.cupVol / 0.33 * 0.1);
       s.sp.position.set(api.cupPos.x + s.ox + Math.sin(s.life * 6 + s.ox * 90) * 0.01, api.cupPos.y + 0.012 + h + s.life * 0.16, api.cupPos.z);
-      const sc = 0.03 + s.life * 0.07; s.sp.scale.set(sc, sc, sc);
-      s.sp.material.opacity = Math.sin(s.life * Math.PI) * 0.5;
+      const sc = 0.05 + s.life * 0.11; s.sp.scale.set(sc, sc, sc);
+      s.sp.material.opacity = Math.sin(s.life * Math.PI) * 0.85;
     }
     // pipe flow animation
     api.flowTex.offset.x -= dt * (0.15 + st.flow * 1.6);

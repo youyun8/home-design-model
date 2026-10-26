@@ -90,13 +90,17 @@ export class Navigator extends EventTarget {
     this.mode = mode;
     this.app.mode = mode === 'tour' ? 'walk' : mode;
     this.controls.enabled = mode === 'orbit';
-    if (mode === 'orbit') {
-      this.camera.fov = 48; this.camera.updateProjectionMatrix();
-    } else {
-      this.camera.fov = 68; this.camera.updateProjectionMatrix();
-      if (prev === 'orbit') this.camera.up.set(0, 1, 0);
-    }
+    this.baseFov = mode === 'orbit' ? 48 : 68;
+    this.applyFov();
+    if (mode !== 'orbit' && prev === 'orbit') this.camera.up.set(0, 1, 0);
     if (!silent) this.dispatchEvent(new CustomEvent('mode', { detail: mode }));
+  }
+
+  /** Portrait screens get a wider vertical field of view so the room is not cropped. */
+  applyFov() {
+    const a = this.camera.aspect, base = this.baseFov || 48;
+    this.camera.fov = a < 1 ? Math.min(base + (1 - a) * 62, 96) : base;
+    this.camera.updateProjectionMatrix();
   }
 
   _fadeCut(fn) {
