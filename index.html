@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>住宅 3D 導覽</title>
+  <meta name="description" content="依施工圖面建立的 18 坪住宅 3D 多角度導覽：環景、第一人稱漫遊、自動導覽，並含自動進水飲水機與水線配置。">
+  <meta name="theme-color" content="#0e1418">
+  <link rel="stylesheet" href="css/style.css">
+  <script type="importmap">
+  { "imports": { "three": "./vendor/three/three.module.js", "three/addons/": "./vendor/three/addons/" } }
+  </script>
+</head>
+<body>
+  <canvas id="view" aria-label="3D 室內導覽畫面"></canvas>
+  <div id="fade"></div>
+
+  <div id="loader" role="status">
+    <div class="loader-card">
+      <div class="loader-mark">3D</div>
+      <h1>住宅 3D 導覽</h1>
+      <p id="loader-text">準備建立 3D 空間…</p>
+      <div class="loader-bar"><i id="loader-fill"></i></div>
+    </div>
+  </div>
+
+  <!-- top bar -->
+  <header id="topbar" class="glass">
+    <div class="brand"><span class="mark">3D</span><div><b>住宅 3D 導覽</b><small>18 坪</small></div></div>
+    <div class="seg" id="mode-seg" role="group" aria-label="導覽模式">
+      <button data-mode="orbit" class="on">環景</button>
+      <button data-mode="walk">漫遊</button>
+      <button data-mode="tour">自動導覽</button>
+    </div>
+    <div class="tools">
+      <div class="seg" id="time-seg" role="group" aria-label="時段">
+        <button data-time="day" class="on">白天</button>
+        <button data-time="dusk">黃昏</button>
+        <button data-time="night">夜晚</button>
+      </div>
+      <button id="btn-lights" class="chip" aria-pressed="false" title="開關全室燈光">燈光</button>
+      <button id="btn-ceiling" class="chip" aria-pressed="false" title="環景模式下顯示天花板">天花板</button>
+      <label class="sel" title="畫質"><select id="sel-quality" aria-label="畫質"><option value="high">高畫質</option><option value="medium">中</option><option value="low">省電</option></select></label>
+      <button id="btn-help" class="chip round" aria-label="操作說明">?</button>
+    </div>
+  </header>
+
+  <!-- view list -->
+  <aside id="views" class="glass">
+    <h2>空間視角</h2>
+    <ul id="view-list"></ul>
+    <details id="room-lights-box">
+      <summary>各房間燈光</summary>
+      <div id="room-lights"></div>
+    </details>
+  </aside>
+
+  <!-- caption + hint -->
+  <div id="caption" class="glass" hidden>
+    <div class="room" id="room-name"></div>
+    <b id="caption-title"></b>
+    <p id="caption-text"></p>
+  </div>
+  <div id="hint" class="glass"><span id="hint-text">拖曳旋轉・滾輪縮放・右鍵平移　|　點擊門片可開關</span></div>
+
+  <!-- minimap -->
+  <div id="minimap-box" class="glass"><canvas id="minimap" width="440" height="260" aria-label="平面小地圖，點擊可傳送"></canvas></div>
+
+  <!-- tooltip + 3D anchored labels -->
+  <div id="tooltip" hidden></div>
+  <div id="labels"></div>
+
+  <!-- touch joystick -->
+  <div id="joystick" hidden><i></i></div>
+
+  <!-- dispenser panel -->
+  <aside id="dispenser-panel" class="glass" hidden>
+    <button class="close" id="dp-close" aria-label="關閉">×</button>
+    <div class="dp-head">
+      <span class="drop">💧</span>
+      <div>
+        <h2>桌上型飲水機・自動進水</h2>
+        <small id="dp-model-name">賀眾牌 UW-672AW-1 桌上冰溫熱</small>
+      </div>
+    </div>
+    <div class="seg small" id="dp-model" role="group" aria-label="機型">
+      <button data-model="AW" class="on">冰溫熱 UW-672AW-1</button>
+      <button data-model="BW">溫熱 UR-672BW-1</button>
+    </div>
+    <div class="dp-specs">
+      <span>寬 32 × 深 48 × 高 52 cm</span><span>熱 3.5 L</span><span>溫 2.0 L</span><span id="dp-cold-spec">冰 1.1 L</span><span id="dp-power">880 W・110 V</span>
+    </div>
+
+    <div class="dp-buttons" id="dp-buttons">
+      <button data-k="cold" class="b-cold"><i></i>冰水</button>
+      <button data-k="warm" class="b-warm"><i></i>溫水</button>
+      <button data-k="hot" class="b-hot"><i></i>熱水</button>
+    </div>
+    <p class="dp-note">按住出水；輕點出一杯 250 ml。取水後水位一下降，進水閥便自動開啟補水（示意加速）。</p>
+
+    <div class="dp-status">
+      <div class="valve" id="dp-valve"><i></i><span id="dp-valve-text">進水閥：關閉</span></div>
+      <div class="msg" id="dp-msg">待機中</div>
+    </div>
+
+    <div class="tank" data-t="hot"><label>熱水箱 <em id="t-hot-temp">98°C</em></label><div class="bar"><i></i></div><span id="t-hot-l">3.50 / 3.5 L</span></div>
+    <div class="tank" data-t="warm"><label>溫水箱 <em id="t-warm-temp">45°C</em></label><div class="bar"><i></i></div><span id="t-warm-l">2.00 / 2.0 L</span></div>
+    <div class="tank" data-t="cold" id="tank-cold"><label>冰水箱 <em id="t-cold-temp">8°C</em></label><div class="bar"><i></i></div><span id="t-cold-l">1.10 / 1.1 L</span></div>
+
+    <div class="dp-toggles">
+      <button id="dp-xray" class="chip wide" aria-pressed="false">顯示水線（開櫃門）</button>
+      <button id="dp-cut" class="chip wide" aria-pressed="false">透視機身內部</button>
+    </div>
+
+    <details class="dp-guide" open>
+      <summary>拉水線配置</summary>
+      <ol>
+        <li>水槽櫃內<b>冷水角閥</b>接<b>三通</b>，一路回水槽龍頭，另一路 3/8" PE 管往濾心櫃。</li>
+        <li>濾心櫃牆面裝 <b>UP-206 雙道濾芯</b>：先 UF-1、再 UF-556。</li>
+        <li>出水管由濾芯櫃檯面後側穿孔（束環）往上，沿牆後接<b>飲水機進水口</b>。</li>
+        <li>飲水機旁牆面預留<b>專用插座</b>（110 V，冰溫熱 880 W／溫熱 750 W），建議獨立迴路。</li>
+        <li>機身後方保留約 5 cm 散熱，接水盤需定期倒水。</li>
+      </ol>
+      <p class="fine">尺寸與容量依你提供的賀眾牌規格圖；外觀為示意建模，細節以實機為準。</p>
+    </details>
+  </aside>
+
+  <dialog id="help">
+    <h2>操作說明</h2>
+    <ul>
+      <li><b>環景</b>：拖曳旋轉、滾輪縮放、右鍵（或雙指）平移。</li>
+      <li><b>漫遊</b>：<kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 移動，拖曳轉向，<kbd>Shift</kbd> 加速，滾輪前進／後退；手機用左下搖桿。</li>
+      <li><b>自動導覽</b>：依序介紹各空間，任何操作即可接手。</li>
+      <li>點擊<b>門片</b>開關；點擊<b>飲水機</b>開啟控制面板，按住水鈕取水。</li>
+      <li>點擊<b>小地圖</b>可傳送到該位置。</li>
+    </ul>
+    <form method="dialog"><button class="chip">知道了</button></form>
+  </dialog>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
