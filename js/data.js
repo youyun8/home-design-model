@@ -95,7 +95,7 @@ export const VIEWS = [
   {
     key: 'study', name: '書房', mode: 'walk', icon: '✎',
     pos: [630, 60, 150], target: [800, 250, 100],
-    text: '地板架高 14 cm 的書房：深色開放書架（LED 層板）、橡木衣櫃、靠東牆的書桌與洞洞板，落地窗配細橫葉簾。',
+    text: '地板架高 14 cm 的書房：開放書架（LED 層板）、橡木衣櫃、靠東牆的書桌與洞洞板，落地窗配細橫葉簾。',
   },
   {
     key: 'bath', name: '衛浴', mode: 'walk', icon: '❖',
