@@ -8,7 +8,8 @@ const S = (m, c = true, r = true) => { m.castShadow = c; m.receiveShadow = r; re
 // 廚房 (x 0..252, y 342..585, ceiling 240).
 // Style taken from the site photo: white flat handleless fronts with a black grip slot, black recessed
 // plinth, a black reveal line under the white counter, dark grey glass backsplash, slim chimney hood.
-// The north counter x 120..252 (sink, filter cabinet, water dispenser) is built in dispenser.js.
+// The north counter x 120..252 (sink, filter cabinet, water dispenser) is built in dispenser.js; the upper
+// cabinets above it are built here, beside the hood.
 // =================================================================================================
 export const COUNTER_TOP = 92.4;
 
@@ -56,6 +57,25 @@ export function buildKitchen(M, ctx) {
   g.add(bx(18, 345, 86, 381, 155.6, 156.2, K, { cast: false }));                // filter grille
   g.add(bx(37, 342, 67, 362, 165, 240, { all: M.hoodWhite }));                   // chimney to the ceiling
   g.add(bx(37.4, 361.8, 66.6, 362.2, 190, 192, K, { cast: false }));
+
+  // ---------------------------------------------------------------- north run: upper cabinets beside the hood (photo)
+  // Three white handleless doors from the hood to the east wall, bottom at 150 cm so the 52 cm dispenser
+  // (top at 144 cm) still has room to be used, with a black grip slot along each bottom edge and a
+  // warm LED strip underneath, like the south run.
+  {
+    const X0 = 93, X1 = 252, Z0 = 150, Z1 = 240, Y0 = 342, YC = 378, YD = 379.8;
+    g.add(bx(X0, Y0, X1, YC, Z0, Z1, W));                                             // carcass
+    g.add(bx(X0 - 0.2, Y0, X0 + 1.4, YD, Z0, Z1, W));                                 // west end panel next to the hood
+    const n = 3, dw = (X1 - X0) / n;
+    for (let i = 0; i < n; i++) {
+      const a0 = X0 + i * dw + 0.3, a1 = X0 + (i + 1) * dw - 0.3;
+      g.add(bx(a0, YC, a1, YD, Z0 + 0.8, Z1 - 0.4, W));
+      g.add(slot(a0, a1, YD, Z0 + 0.8, 'S', false));                                  // grip slot on the bottom edge
+    }
+    g.add(bx(X0, YC + 0.3, X1, YC + 0.9, Z0 - 0.15, Z0 + 0.1, K, { cast: false }));   // shadow line under the cabinet
+    g.add(led(M, X0 + 2, YC - 6, X1 - 2, YC - 6, Z0 - 1.5, 1.2));
+    ctx.colliders.push([X0, Y0, X1, YD]);
+  }
 
   // ---------------------------------------------------------------- north wall: dark grey glass backsplash
   g.add(bx(0, 342, 252, 342.6, COUNTER_TOP, 150, { all: M.glassBacksplash }, { cast: false }));
