@@ -167,6 +167,7 @@ export function buildArchitecture(M) {
   ceil([610, 376, 878, 500], 240); ceil([878, 448, 914, 585], 240); ceil([714, 500, 878, 585], 240);
   // curtain boxes along the north windows (實內 25cm)
   const drop = (r, zBottom, zTop, mat = M.ceilingWhite) => groups.ceilings.add(box(r[0], r[1], r[2], r[3], zBottom, zTop, { all: mat }, { cast: false }));
+  drop([-157, 0, 252, 25], 247, 270);   // 主臥北牆 實內 25cm、立板 CH247 (A0 天花板圖)
   drop([262, 0, 598, 25], 262, 280);
   // soffit step face at y = 325 (ducted A/C zone) with LED cove
   drop([262, SOFFIT.y0 - 4, 598, SOFFIT.y0], SOFFIT.h, 280);
