@@ -376,21 +376,21 @@ export function flutedNormal() {
 export function bathWallTile({ seed = 31 } = {}) {
   const W = 1024, H = 1024, sizeW = 1.2, sizeH = 1.2;
   const cvs = mk(W, H), c = cvs.getContext('2d'), r = mulberry32(seed);
-  c.fillStyle = '#f1f1ef'; c.fillRect(0, 0, W, H);
+  c.fillStyle = '#ece4d3'; c.fillRect(0, 0, W, H);
   const n = tileFbm(seed, 3, 4);
   const img = c.getImageData(0, 0, W, H);
   for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
     const v = (n(x / W, y / H) - 0.5) * 9, i = (y * W + x) * 4;
-    img.data[i] = clamp255(241 + v); img.data[i + 1] = clamp255(241 + v); img.data[i + 2] = clamp255(239 + v);
+    img.data[i] = clamp255(237 + v); img.data[i + 1] = clamp255(229 + v); img.data[i + 2] = clamp255(214 + v);
   }
   c.putImageData(img, 0, 0);
   for (let i = 0; i < 2600; i++) {
     const x = r() * W, y = r() * H, rad = 0.8 + r() * r() * 3.4;
-    c.fillStyle = r() < 0.7 ? `rgba(196,198,200,${0.25 + r() * 0.4})` : `rgba(220,214,206,${0.25 + r() * 0.35})`;
+    c.fillStyle = r() < 0.7 ? `rgba(196,186,170,${0.25 + r() * 0.4})` : `rgba(222,212,194,${0.25 + r() * 0.35})`;
     c.beginPath(); c.ellipse(x, y, rad, rad * (0.6 + r() * 0.5), r() * 6.28, 0, 6.28); c.fill();
   }
   // joints: two 60 cm columns, one 120 cm row
-  c.fillStyle = 'rgba(176,178,178,0.9)';
+  c.fillStyle = 'rgba(184,174,158,0.9)';
   for (let k = 0; k <= 2; k++) c.fillRect(k * W / 2 - 1, 0, 2, H);
   c.fillRect(0, H - 1, W, 2); c.fillRect(0, 0, W, 1);
   return { map: toTex(cvs, { repeat: [1 / sizeW, 1 / sizeH] }) };
