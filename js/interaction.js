@@ -47,7 +47,7 @@ export function setupInteraction(app, nav, ui) {
     g.fillStyle = gr; g.fillRect(0, 0, 256, 144);
     g.fillStyle = 'rgba(255,255,255,.14)';
     for (let i = 0; i < 5; i++) { g.beginPath(); g.arc(128 + Math.sin(t * 0.7 + i) * 90, 72 + Math.cos(t * 0.5 + i * 1.7) * 40, 26 + i * 8, 0, 7); g.fill(); }
-    g.fillStyle = 'rgba(255,255,255,.85)'; g.font = 'bold 18px system-ui, sans-serif'; g.fillText('住宅 3D 導覽', 14, 126);
+    g.fillStyle = 'rgba(255,255,255,.85)'; g.font = 'bold 18px system-ui, sans-serif'; g.fillText('8C 住宅', 14, 126);
     tvTex.needsUpdate = true;
   };
   app.updateTV = (dt) => { if (!tvOn) return; tvT += dt; if (((tvT * 12) | 0) !== (((tvT - dt) * 12) | 0)) drawTV(tvT); };

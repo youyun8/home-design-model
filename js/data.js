@@ -1,4 +1,4 @@
-// Plan data transcribed from the construction drawings (18-ping residence).
+// Plan data transcribed from the construction drawings (Unit 8C, 18 ping).
 // Plan coordinates are centimetres: x grows to the east, y grows to the south,
 // origin = inner face of the kitchen west wall at the level of the north inner wall face.
 // Heights (z) are centimetres above the finished floor.
@@ -50,7 +50,7 @@ export const VIEWS = [
   {
     key: 'overview', name: '空間總覽', mode: 'orbit', icon: '◎',
     pos: [650, 1040, 1010], target: [330, 215, 20],
-    text: '18 坪住宅。主臥、廚房、客廳、書房、衛浴與後陽台的完整配置。',
+    text: '8C・18 坪住宅。主臥、廚房、客廳、書房、衛浴與後陽台的完整配置。',
   },
   {
     key: 'entry', name: '玄關・降落塵區', mode: 'walk', icon: '⌂',
