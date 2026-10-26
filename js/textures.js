@@ -196,13 +196,13 @@ export function hexTile() {
   const cvs = mk(cw, ch), c = cvs.getContext('2d');
   const bmp = mk(cw, ch), b = bmp.getContext('2d');
   const r = mulberry32(77), n = makeNoise(31, 32);
-  const pal = [[178, 164, 148, 0.30], [150, 138, 124, 0.26], [120, 110, 100, 0.22], [94, 88, 82, 0.14], [198, 188, 174, 0.08]];
+  const pal = [[150, 150, 144, 0.20], [108, 118, 112, 0.20], [92, 102, 112, 0.18], [124, 112, 98, 0.12], [86, 92, 90, 0.14], [168, 166, 158, 0.10], [96, 82, 74, 0.06]];
   const pick = () => { let t = r(), a = 0; for (const p of pal) { a += p[3]; if (t <= a) return p; } return pal[0]; };
   const colors = [];
   for (let i = 0; i < ROWS * COLS; i++) colors.push(pick());
-  c.fillStyle = '#7d766d'; c.fillRect(0, 0, cw, ch);
+  c.fillStyle = '#2f3130'; c.fillRect(0, 0, cw, ch);
   b.fillStyle = '#202020'; b.fillRect(0, 0, cw, ch);
-  const rad = R * PPM - 2.2; // minus half grout
+  const rad = R * PPM - 2.6; // minus half grout
   const path = (ctx, cx, cy) => {
     ctx.beginPath();
     for (let i = 0; i < 6; i++) {
@@ -217,7 +217,7 @@ export function hexTile() {
       const cx = (col + (((row % 2) + 2) % 2 ? 0.5 : 0)) * W * PPM;
       const cy = row * 1.5 * R * PPM;
       const p = colors[(((row % ROWS) + ROWS) % ROWS) * COLS + (((col % COLS) + COLS) % COLS)];
-      const v = (n(cx * 0.03, cy * 0.03) - 0.5) * 14;
+      const v = (n(cx * 0.03, cy * 0.03) - 0.5) * 22;
       c.fillStyle = `rgb(${clamp255(p[0] + v)},${clamp255(p[1] + v)},${clamp255(p[2] + v)})`;
       path(c, cx, cy); c.fill();
       b.fillStyle = '#b4b4b4'; path(b, cx, cy); b.fill();
@@ -367,6 +367,118 @@ export function flutedNormal() {
   const t = toTex(cvs, { srgb: false, repeat: [1, 1] });
   t.minFilter = THREE.LinearFilter; t.generateMipmaps = false; t.needsUpdate = true;
   return t;
+}
+
+// ---------------------------------------------------------------------------------------------
+// Tiles taken from the site photos
+// ---------------------------------------------------------------------------------------------
+/** Glossy white large-format wall tile with fine grey flecks (bathroom walls). One canvas = 2 x 1 tiles of 60 x 120 cm laid vertically. */
+export function bathWallTile({ seed = 31 } = {}) {
+  const W = 1024, H = 1024, sizeW = 1.2, sizeH = 1.2;
+  const cvs = mk(W, H), c = cvs.getContext('2d'), r = mulberry32(seed);
+  c.fillStyle = '#f1f1ef'; c.fillRect(0, 0, W, H);
+  const n = tileFbm(seed, 3, 4);
+  const img = c.getImageData(0, 0, W, H);
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const v = (n(x / W, y / H) - 0.5) * 9, i = (y * W + x) * 4;
+    img.data[i] = clamp255(241 + v); img.data[i + 1] = clamp255(241 + v); img.data[i + 2] = clamp255(239 + v);
+  }
+  c.putImageData(img, 0, 0);
+  for (let i = 0; i < 2600; i++) {
+    const x = r() * W, y = r() * H, rad = 0.8 + r() * r() * 3.4;
+    c.fillStyle = r() < 0.7 ? `rgba(196,198,200,${0.25 + r() * 0.4})` : `rgba(220,214,206,${0.25 + r() * 0.35})`;
+    c.beginPath(); c.ellipse(x, y, rad, rad * (0.6 + r() * 0.5), r() * 6.28, 0, 6.28); c.fill();
+  }
+  // joints: two 60 cm columns, one 120 cm row
+  c.fillStyle = 'rgba(176,178,178,0.9)';
+  for (let k = 0; k <= 2; k++) c.fillRect(k * W / 2 - 1, 0, 2, H);
+  c.fillRect(0, H - 1, W, 2); c.fillRect(0, 0, W, 1);
+  return { map: toTex(cvs, { repeat: [1 / sizeW, 1 / sizeH] }) };
+}
+
+/** Terrazzo accent (white body, orange-brown / navy / grey chips, faint 10 cm grid). */
+export function terrazzoAccent({ seed = 12 } = {}) {
+  const W = 800, H = 1200, sizeW = 0.8, sizeH = 1.2, pxm = W / sizeW;
+  const cvs = mk(W, H), c = cvs.getContext('2d'), r = mulberry32(seed);
+  c.fillStyle = '#efeeea'; c.fillRect(0, 0, W, H);
+  const pal = [[176, 112, 58], [196, 134, 72], [150, 92, 52], [54, 62, 80], [78, 86, 104], [108, 110, 116], [188, 188, 190], [218, 214, 206]];
+  const wts = [0.16, 0.12, 0.08, 0.18, 0.1, 0.14, 0.12, 0.1];
+  const pick = () => { let t = r(), a = 0; for (let i = 0; i < pal.length; i++) { a += wts[i]; if (t <= a) return pal[i]; } return pal[0]; };
+  for (let i = 0; i < 1500; i++) {
+    const x = r() * W, y = r() * H, rad = (0.35 + r() * r() * 1.0 + (r() < 0.06 ? 0.55 : 0)) * 0.01 * pxm; // 0.35 .. 1.9 cm
+    const col = pick(), k = (r() - 0.5) * 20;
+    c.fillStyle = `rgb(${clamp255(col[0] + k)},${clamp255(col[1] + k)},${clamp255(col[2] + k)})`;
+    const nv = 5 + ((r() * 3) | 0), rot = r() * 6.28;
+    c.beginPath();
+    for (let j = 0; j < nv; j++) { const a = rot + (j / nv) * 6.28, rr = rad * (0.6 + r() * 0.55); const px = x + Math.cos(a) * rr, py = y + Math.sin(a) * rr * 0.8; if (j === 0) c.moveTo(px, py); else c.lineTo(px, py); }
+    c.closePath(); c.fill();
+  }
+  c.strokeStyle = 'rgba(190,190,188,0.35)'; c.lineWidth = 1;
+  for (let x = 0; x <= W; x += 0.1 * pxm) { c.beginPath(); c.moveTo(x, 0); c.lineTo(x, H); c.stroke(); }
+  for (let y = 0; y <= H; y += 0.1 * pxm) { c.beginPath(); c.moveTo(0, y); c.lineTo(W, y); c.stroke(); }
+  return { map: toTex(cvs, { repeat: [1 / sizeW, 1 / sizeH] }) };
+}
+
+/** Porcelain with fine pale speckles and thin dark joints (bathroom floor 60 x 60). */
+export function speckleTile({ tw = 0.6, th = 0.6, cols = 2, rows = 2, base = [218, 216, 210], speck = [[236, 234, 229], [196, 193, 186], [208, 205, 197]], grout = [58, 58, 60], gw = 0.003, density = 7000, seed = 21 } = {}) {
+  const sizeW = tw * cols, sizeH = th * rows, W = 1024, H = Math.round(W * sizeH / sizeW), pxm = W / sizeW;
+  const cvs = mk(W, H), c = cvs.getContext('2d'), r = mulberry32(seed);
+  const n = tileFbm(seed, 4, 4);
+  const img = c.createImageData(W, H);
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const v = (n(x / W, y / H) - 0.5) * 12, i = (y * W + x) * 4;
+    img.data[i] = clamp255(base[0] + v); img.data[i + 1] = clamp255(base[1] + v); img.data[i + 2] = clamp255(base[2] + v); img.data[i + 3] = 255;
+  }
+  c.putImageData(img, 0, 0);
+  for (let i = 0; i < density; i++) {
+    const x = r() * W, y = r() * H, rad = (0.15 + r() * r() * 1.1) * 0.01 * pxm, col = speck[(r() * speck.length) | 0];
+    c.fillStyle = `rgba(${col[0]},${col[1]},${col[2]},${0.5 + r() * 0.5})`;
+    c.beginPath(); c.ellipse(x, y, rad, rad * (0.55 + r() * 0.5), r() * 6.28, 0, 6.28); c.fill();
+  }
+  const g = Math.max(2, gw * pxm);
+  c.fillStyle = `rgb(${grout.join(',')})`;
+  for (let i = 0; i <= cols; i++) c.fillRect((i / cols) * W - g / 2, 0, g, H);
+  for (let j = 0; j <= rows; j++) c.fillRect(0, (j / rows) * H - g / 2, W, g);
+  const bmp = mk(W, H), b = bmp.getContext('2d'); b.fillStyle = '#9a9a9a'; b.fillRect(0, 0, W, H); b.fillStyle = '#202020';
+  for (let i = 0; i <= cols; i++) b.fillRect((i / cols) * W - g / 2, 0, g, H);
+  for (let j = 0; j <= rows; j++) b.fillRect(0, (j / rows) * H - g / 2, W, g);
+  return { map: toTex(cvs, { repeat: [1 / sizeW, 1 / sizeH] }), bump: toTex(bmp, { srgb: false, repeat: [1 / sizeW, 1 / sizeH] }) };
+}
+
+/** Narrow "stick" brick tile, running bond (balcony walls). rowH / len in metres. */
+export function stickBrick({ base = [78, 76, 76], grout = [58, 58, 58], rowH = 0.046, len = 0.24, var_ = 16, ridged = true, seed = 5 } = {}) {
+  const rows = 6, sizeW = len * 2, sizeH = rowH * rows, ppm = 1800;
+  const W = Math.round(sizeW * ppm), H = Math.round(sizeH * ppm), ph = H / rows;
+  const cvs = mk(W, H), c = cvs.getContext('2d'), bmp = mk(W, H), b = bmp.getContext('2d'), r = mulberry32(seed);
+  c.fillStyle = `rgb(${grout.join(',')})`; c.fillRect(0, 0, W, H);
+  b.fillStyle = '#303030'; b.fillRect(0, 0, W, H);
+  const g = 0.003 * ppm;
+  for (let row = 0; row < rows; row++) {
+    const off = (row % 2) * (len * ppm) / 2;
+    for (let k = -1; k <= 2; k++) {
+      const x0 = off + k * len * ppm, v = (r() - 0.5) * var_ * 2;
+      c.fillStyle = `rgb(${clamp255(base[0] + v)},${clamp255(base[1] + v)},${clamp255(base[2] + v)})`;
+      c.fillRect(x0 + g / 2, row * ph + g / 2, len * ppm - g, ph - g);
+      b.fillStyle = '#c8c8c8'; b.fillRect(x0 + g / 2, row * ph + g / 2, len * ppm - g, ph - g);
+      if (ridged) { // horizontal ridges across each tile
+        for (let q = 1; q < 4; q++) { c.fillStyle = 'rgba(0,0,0,0.16)'; c.fillRect(x0 + g / 2, row * ph + q * ph / 4, len * ppm - g, 1.2); b.fillStyle = '#707070'; b.fillRect(x0 + g / 2, row * ph + q * ph / 4, len * ppm - g, 1.6); }
+      }
+    }
+  }
+  return { map: toTex(cvs, { repeat: [1 / sizeW, 1 / sizeH] }), bump: toTex(bmp, { srgb: false, repeat: [1 / sizeW, 1 / sizeH] }) };
+}
+
+/** Linear aluminium slat ceiling, 10 cm panels. */
+export function slatCeiling() {
+  const size = 0.4, W = 512, cvs = mk(W, W), c = cvs.getContext('2d');
+  const pw = W / 4;
+  for (let i = 0; i < 4; i++) {
+    const gr = c.createLinearGradient(i * pw, 0, (i + 1) * pw, 0);
+    gr.addColorStop(0, '#c9ccce'); gr.addColorStop(0.5, '#d4d7d9'); gr.addColorStop(1, '#c4c7c9');
+    c.fillStyle = gr; c.fillRect(i * pw, 0, pw, W);
+    c.fillStyle = '#8f9396'; c.fillRect(i * pw, 0, 3, W);
+  }
+  return { map: toTex(cvs, { repeat: [1 / size, 1 / size] }) };
 }
 
 // ---------------------------------------------------------------------------------------------

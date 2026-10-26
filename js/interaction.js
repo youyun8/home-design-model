@@ -9,6 +9,7 @@ export function setupInteraction(app, nav, ui) {
   const tip = document.getElementById('tooltip');
   const targets = [...arch.doors.map((d) => d.group), disp.build.unit.group];
   if (app.tv) targets.push(app.tv);
+  targets.push(...app.curtains.clickable);
 
   const pick = (e) => {
     const r = canvas.getBoundingClientRect();
@@ -22,6 +23,7 @@ export function setupInteraction(app, nav, ui) {
         if (o.userData.btn) return { type: 'btn', key: o.userData.btn, obj: o };
         if (o.userData.door) return { type: 'door', door: o.userData.door };
         if (o.userData.tv) return { type: 'tv' };
+        if (o.userData.curtain) return { type: 'curtain' };
         if (o.userData.dispenser) return { type: 'dispenser' };
         o = o.parent;
       }
@@ -74,6 +76,7 @@ export function setupInteraction(app, nav, ui) {
     if (!hit) return;
     if (hit.type === 'door') hit.door.toggle();
     else if (hit.type === 'tv') setTV(!tvOn);
+    else if (hit.type === 'curtain') app.curtains.toggle();
     else if (hit.type === 'dispenser') { ui.panel.open(); ui.panel.pinned = true; }
   };
   addEventListener('pointerup', up);
@@ -88,6 +91,7 @@ export function setupInteraction(app, nav, ui) {
     if (hit) {
       if (hit.type === 'btn') text = hit.obj.userData.hover;
       else if (hit.type === 'door') text = `${hit.door.name}（點擊${hit.door.open ? '關閉' : '開啟'}）`;
+      else if (hit.type === 'curtain') text = `遮光窗簾（點擊${app.curtains.closed ? '拉開' : '拉上'}）`;
       else if (hit.type === 'tv') text = `65 吋電視（點擊${tvOn ? '關閉' : '開啟'}）`;
       else if (hit.type === 'dispenser') text = '賀眾牌飲水機（點擊開啟控制面板）';
     }

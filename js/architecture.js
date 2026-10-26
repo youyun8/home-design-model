@@ -60,12 +60,12 @@ export function buildArchitecture(M) {
     piece(cur, hi, z0, z1, firstEnd, false, true);
   }
 
-  const Wh = M.wallWhite, Pl = M.wallPlaster, Ex = M.exterior, Tz = M.wallTerrazzo, Kt = M.wallKitchenTile;
+  const Wh = M.wallWhite, Pl = M.wallPlaster, Ex = M.exterior, Tz = M.wallTerrazzo, Kt = Wh; // kitchen walls are rose white; the glass backsplash is built with the cabinets
 
   // --- north façade (group N) with three window openings
   wall([-172, -15, 876, 0], { n: Ex, s: Wh, e: Ex, w: Ex, jamb: Wh }, [
     { a: -152, b: 122, sill: 4, head: 238, win: true },
-    { a: 272, b: 588, sill: 4, head: 258, win: true },
+    { a: 272, b: 588, sill: 4, head: 212, win: true },
     { a: 715, b: 858, sill: 14, head: 228, win: true },
   ], { group: groups.N });
   // exterior structural blocks / AC window box on the north side
@@ -84,12 +84,13 @@ export function buildArchitecture(M) {
 
   // --- west façade (group W)
   wall([-172, 0, -157, 342], { n: Ex, s: Ex, e: Wh, w: Ex, jamb: Wh }, [{ a: 64, b: 190, sill: 4, head: 238, win: true }], { group: groups.W });
-  wall([-193, 342, -178, 600], { n: Ex, s: Ex, e: M.laminateWhite, w: Ex, jamb: M.laminateWhite }, [{ a: 372, b: 560, sill: 90, head: 222 }], { group: groups.W });
+  // rear balcony: the west side is open (metal railing built in furn-rooms-b.js), inside faces are light grey stick brick
+  wall([-193, 342, -178, 600], { n: Ex, s: Ex, e: M.brickLight, w: Ex, jamb: M.brickLight }, [{ a: 372, b: 560, sill: 0, head: 240 }], { group: groups.W });
   groups.W.add(box(-200, -100, -160, 0, 0, SLAB + 20, { all: M.concreteDark }));
   groups.W.add(box(-200, 500, -178, 600, 0, SLAB + 20, { all: M.concreteDark }));
 
   // --- south façade (group S)
-  wall([-193, 585, -16, 600], { n: M.laminateWhite, s: Ex, e: Ex, w: Ex }, [], { group: groups.S });
+  wall([-193, 585, -16, 600], { n: M.brickLight, s: Ex, e: Ex, w: Ex }, [], { group: groups.S });
   wall([-16, 585, 262, 600], { n: Wh, s: Ex, e: Ex, w: Ex }, [], { group: groups.S });
   wall([262, 585, 598, 600], { n: Pl, s: Ex, e: Ex, w: Ex, jamb: Wh }, [{ a: 462, b: 574, sill: 0, head: 222 }], { group: groups.S });
   wall([598, 585, 930, 600], { n: Tz, s: Ex, e: Ex, w: Ex }, [], { group: groups.S });
@@ -104,10 +105,10 @@ export function buildArchitecture(M) {
 
   // --- interior walls
   // bedroom | kitchen divider (also balcony north wall)
-  wall([-193, 333, 0, 342], { n: Wh, s: Ex, e: Wh, w: Wh });
+  wall([-193, 333, 0, 342], { n: Wh, s: M.brickDark, e: Wh, w: Wh });   // balcony back wall: dark grey stick brick
   wall([0, 333, 252, 342], { n: Wh, s: Kt, e: Wh, w: Wh });
   // kitchen west wall with balcony door
-  wall([-16, 342, 0, 585], { n: Wh, s: Wh, e: Kt, w: M.laminateWhite, jamb: M.laminateWhite }, [{ a: 414, b: 500, sill: 0, head: 215 }]);
+  wall([-16, 342, 0, 585], { n: Wh, s: Wh, e: Kt, w: M.brickLight, jamb: M.blackMatte }, [{ a: 414, b: 500, sill: 0, head: 215 }]);
   // TV wall / kitchen east wall (x 252..262)
   wall([252, 0, 262, 342], { n: Wh, s: Wh, e: Pl, w: Wh, jamb: M.blackMatte }, [{ a: 5, b: 95, sill: 0, head: 218 }]);
   wall([252, 342, 262, 585], { n: Wh, s: Wh, e: Pl, w: Kt, jamb: M.blackMatte }, [{ a: 413, b: 497, sill: 0, head: 215 }]);
@@ -156,13 +157,13 @@ export function buildArchitecture(M) {
   // -------------------------------------------------------------------------------------------
   // ceilings (+ drops, LED coves)
   // -------------------------------------------------------------------------------------------
-  const ceil = (r, z, th = 4) => groups.ceilings.add(box(r[0], r[1], r[2], r[3], z, z + th, { b: M.ceilingWhite, all: M.ceilingWhite }, { cast: false }));
+  const ceil = (r, z, th = 4, under = M.ceilingWhite) => groups.ceilings.add(box(r[0], r[1], r[2], r[3], z, z + th, { b: under, all: M.ceilingWhite }, { cast: false }));
   ceil([-157, 0, 252, 342], 270);
   ceil([262, 0, 598, SOFFIT.y0], 280);
   ceil([SOFFIT.x0, SOFFIT.y0, SOFFIT.x1, SOFFIT.y1], SOFFIT.h);
   ceil([610, 0, 862, 357], 270);
   ceil([0, 342, 252, 585], 240);
-  ceil([-193, 342, -16, 585], 240);
+  ceil([-193, 342, -16, 585], 240, 4, M.alumCeiling);   // aluminium slat ceiling
   ceil([610, 376, 878, 500], 240); ceil([878, 448, 914, 585], 240); ceil([714, 500, 878, 585], 240);
   // curtain boxes along the north windows (實內 25cm)
   const drop = (r, zBottom, zTop, mat = M.ceilingWhite) => groups.ceilings.add(box(r[0], r[1], r[2], r[3], zBottom, zTop, { all: mat }, { cast: false }));
@@ -178,7 +179,7 @@ export function buildArchitecture(M) {
     groups.ceilings.add(box(a, 340, a + 0.8, 445, SOFFIT.h - 0.7, SOFFIT.h, { all: M.blackMatte }, { cast: false }));
   });
   // study: sliding door rail soffit (CH+229) and bookcase soffit (CH+244)
-  drop([610, 0, 640, 357], 229, 270, M.paintSage);
+  drop([610, 0, 640, 357], 229, 270, M.wallWhite);   // rail soffit: rose white like every study wall
   drop([610, 296, 862, 357], 244, 270);
   // bedroom: wardrobe-side drop (立板 CH+247)
   drop([160, 0, 252, 10], 247, 270);
@@ -222,10 +223,9 @@ export function buildArchitecture(M) {
     return g;
   }
   windowUnit({ axis: 'x', a: -152, b: 122, c: -7.5, sill: 4, head: 238, panels: 3, group: groups.N });
-  windowUnit({ axis: 'x', a: 272, b: 588, c: -7.5, sill: 4, head: 258, panels: 4, group: groups.N });
+  windowUnit({ axis: 'x', a: 272, b: 588, c: -7.5, sill: 4, head: 212, panels: 4, group: groups.N });
   windowUnit({ axis: 'x', a: 715, b: 858, c: -7.5, sill: 14, head: 228, panels: 2, group: groups.N });
   windowUnit({ axis: 'y', a: 64, b: 190, c: -164.5, sill: 4, head: 238, panels: 2, group: groups.W });
-  windowUnit({ axis: 'y', a: 372, b: 560, c: -185.5, sill: 90, head: 222, panels: 2, group: groups.W, frameMat: M.aluminumWhite });
 
   // -------------------------------------------------------------------------------------------
   // doors
@@ -353,19 +353,22 @@ export function buildArchitecture(M) {
     },
   });
 
-  // balcony door: white aluminium frame with clear glass, slides north on the kitchen side
+  // balcony door (photo): black aluminium, fixed louvres in the lower third, clear glass above a mid rail
   slideDoor({
     id: 'door-balcony', name: '後陽台鋁門', pos: [-6, 414], along: [0, -1], dist: 84, width: 86, height: 214,
     collider: [-16, 414, 0, 500],
     build(g, { width, height }) {
       const m = (w, d, h, mat, x, y, z) => { const o = cbox(w, d, h, mat); o.position.set(x * CM, y * CM, z * CM); g.add(o); return o; };
-      const bar = 4.6;
-      m(3, bar, height, M.aluminumWhite, 0, height / 2, bar / 2);
-      m(3, bar, height, M.aluminumWhite, 0, height / 2, width - bar / 2);
-      m(3, width, bar, M.aluminumWhite, 0, height - bar / 2, width / 2);
-      m(3, width, bar * 2.2, M.aluminumWhite, 0, bar * 1.1, width / 2);
-      const glass = cbox(0.6, width - 2 * bar, height - 3.3 * bar, M.glass, { cast: false });
-      glass.position.set(0, (height / 2 + 4) * CM, (width / 2) * CM); glass.renderOrder = 6; g.add(glass);
+      const bar = 5, midZ = 78;
+      m(3, bar, height, M.blackMetal, 0, height / 2, bar / 2);
+      m(3, bar, height, M.blackMetal, 0, height / 2, width - bar / 2);
+      m(3, width, bar, M.blackMetal, 0, height - bar / 2, width / 2);
+      m(3, width, bar, M.blackMetal, 0, bar / 2, width / 2);
+      m(3, width, 4.5, M.blackMetal, 0, midZ, width / 2);
+      for (let z = 8; z < midZ - 4; z += 6.4) m(2.2, width - 2 * bar, 1.2, M.blackMetal, 0, z, width / 2).rotation.x = 0.35;   // louvre blades
+      const glass = cbox(0.6, width - 2 * bar, height - midZ - 2 * bar, M.glass, { cast: false });
+      glass.position.set(0, ((height + midZ) / 2) * CM, (width / 2) * CM); glass.renderOrder = 6; g.add(glass);
+      m(2.4, 2.4, 40, M.blackMetal, 2.4, 104, width - 10);
     },
   });
 

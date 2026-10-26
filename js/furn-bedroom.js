@@ -2,13 +2,14 @@ import * as THREE from 'three';
 import { CM } from './core.js';
 import { rbox, bx, led } from './furn-common.js';
 import { acUnit } from './furn-rooms-a.js';
-import { blind, nightstand, woodArmchair, sideTableRound } from './decor.js';
+import { nightstand, woodArmchair, sideTableRound } from './decor.js';
+import { softMesh } from './soft.js';
 
 const S = (m, c = true, r = true) => { m.castShadow = c; m.receiveShadow = r; return m; };
 
 // =================================================================================================
-// 主臥 (x -157..252, y 0..333, ceiling 270): oak headboard panel with LED, two low platform beds,
-// full-height oak wardrobe, wood armchair at the floor-length window, zebra blinds
+// 主臥 (x -157..252, y 0..333, ceiling 270): oak headboard panel with LED, two low floating platform beds,
+// full-height oak wardrobe, wood armchair at the floor-length window; curtains are added by curtains.js
 // =================================================================================================
 export function buildBedroom(M, ctx) {
   const g = new THREE.Group();
@@ -19,23 +20,22 @@ export function buildBedroom(M, ctx) {
   g.add(bx(-157, 321, 192, 324, 103.6, 105, { all: M.oak }));
   g.add(led(M, -156, 324, 191, 324, 105, 1.4));
 
-  // ---- beds: 3.5 ft + 5 ft, low oak platform frames
-  const bed = (x0, x1, pillows, throwLen) => {
+  // ---- beds (recommended): low floating oak platform frames, 22 cm pocket-spring mattress, cotton-linen
+  // sheet, oat duvet folded back at the head end, one pillow per 75 cm of width. 3.5 ft + 5 ft.
+  const bed = (x0, x1, pillows) => {
     const w = x1 - x0, cx = (x0 + x1) / 2;
-    g.add(bx(x0 + 1, 140, x1 - 1, 322, 14, 27, { all: M.oak }));
-    g.add(bx(x0 + 4, 143, x1 - 4, 319, 4, 14, { all: M.shadowGap }, { cast: false }));
-    g.add(S(rbox(cx, 231, w - 4, 182, 27, 41, M.linen, 3, 4)));
-    g.add(S(rbox(cx, 205, w - 1.5, 150, 38, 48, M.boucle, 5, 4)));
-    g.add(S(rbox(cx, 134 + 24, w + 0.5, 16, 33, 49, M.boucle, 4, 4)));
-    if (throwLen) g.add(S(rbox(cx, 168, w - 6, throwLen, 47, 51, M.throwStripe, 2, 3)));
-    const pw = (w - 8) / pillows.length;
-    pillows.forEach((mat, i) => {
-      const p = rbox(x0 + 4 + pw * (i + 0.5), 306 - (i % 2) * 3, pw - 3, 34, 41, 57, mat, 6, 5);
-      p.rotation.set(-0.14, (i % 2 ? 0.08 : -0.06), 0); g.add(S(p));
-    });
+    g.add(S(rbox(cx, 231, w - 2, 184, 13, 26, M.oak, 1.6, 3)));                            // platform slab
+    g.add(bx(x0 + 12, 152, x1 - 12, 312, 3, 13, { all: M.shadowGap }, { cast: false }));   // recessed base: the frame floats
+    g.add(softMesh({ w: w - 5, h: 22, d: 180, r: 6, fold: 0.15 }, M.bedSheet, cx, 232, 37));               // mattress, top at 48
+    g.add(softMesh({ w: w + 3, h: 25, d: 126, r: 9, fold: 0.7, crown: 1.2, seed: x0 }, M.bedDuvet, cx, 204, 43.5)); // duvet, hangs 12 cm down both sides
+    g.add(softMesh({ w: w + 1.5, h: 10, d: 28, r: 5, fold: 0.6, seed: x1 }, M.bedDuvet, cx, 262, 56));    // folded-back head end
+    const pw = (w - 8) / pillows;
+    for (let i = 0; i < pillows; i++) {
+      g.add(softMesh({ w: Math.min(pw - 4, 62), h: 14, d: 38, r: 6, fold: 0.5, pinch: 0.5, crown: 2, seed: i + x0 }, M.bedPillow, x0 + 4 + pw * (i + 0.5), 304, 56, { x: -0.16 }));
+    }
   };
-  bed(-155, -52, [M.linen, M.pillowGrey], 34);
-  bed(-50, 100, [M.pillowGrey, M.linen, M.linen], 40);
+  bed(-155, -52, 1);
+  bed(-50, 100, 2);
   g.add(nightstand(M, 126, 302));
   ctx.colliders.push([-157, 140, 100, 333], [104, 284, 148, 324]);
 
@@ -61,11 +61,9 @@ export function buildBedroom(M, ctx) {
   }
   g.add(acUnit(M, 241, 54, 90, 226));
 
-  // ---- window corner: wood armchair, round table, zebra blinds
+  // ---- window corner: wood armchair, round table (curtains come from curtains.js)
   g.add(woodArmchair(M, -126, 118, -Math.PI / 2));
   g.add(sideTableRound(M, -94, 176));
   ctx.colliders.push([-158, 88, -100, 150], [-124, 150, -62, 202]);
-  g.add(blind(M, { axis: 'x', a: -152, b: 122, c: 4, zTop: 236, zBottom: 118 }));
-  g.add(blind(M, { axis: 'y', a: 64, b: 190, c: -155, zTop: 236, zBottom: 112 }));
   return g;
 }

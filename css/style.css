@@ -62,6 +62,14 @@ button, select { font: inherit; color: inherit; }
 #view-list button.on { background: rgba(84, 182, 196, .22); box-shadow: inset 0 0 0 1px rgba(84, 182, 196, .55); }
 #view-list .ic { width: 24px; height: 24px; display: grid; place-items: center; flex: none; border-radius: 7px; background: rgba(255, 255, 255, .07); font-size: 12px; }
 #view-list li.feature button { color: #bfeaf0; }
+#spec-box { margin-top: 10px; border-top: 1px solid var(--glass-border); padding-top: 8px; font-size: 12.5px; }
+#spec-box summary { cursor: pointer; color: var(--muted); padding: 4px 6px; }
+#spec-box .spec { padding: 4px 6px 2px; display: grid; gap: 4px; }
+#spec-box b { color: #dbe9ec; font-size: 12.5px; margin-top: 4px; }
+#spec-box p { margin: 0; color: #b9c8ce; line-height: 1.5; font-size: 12px; }
+.swatches { display: flex; gap: 8px; padding: 2px 0 4px; }
+.swatches button { width: 24px; height: 24px; border-radius: 50%; background: var(--c); border: 2px solid rgba(255, 255, 255, .25); cursor: pointer; padding: 0; }
+.swatches button[aria-pressed="true"] { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(84, 182, 196, .35); }
 #room-lights-box { margin-top: 10px; border-top: 1px solid var(--glass-border); padding-top: 8px; font-size: 13px; }
 #room-lights-box summary { cursor: pointer; color: var(--muted); padding: 4px 6px; }
 #room-lights { display: grid; gap: 4px; padding: 6px 4px; }
@@ -151,7 +159,7 @@ kbd { background: rgba(255, 255, 255, .12); border-radius: 5px; padding: 1px 6px
   #minimap-box { display: none; }
   #hint { display: none; }
   #views { top: auto; left: 8px; right: 8px; bottom: 8px; width: auto; padding: 6px; overflow-x: auto; overflow-y: hidden; }
-  #views h2, #room-lights-box { display: none; }
+  #views h2, #room-lights-box, #spec-box { display: none; }
   #view-list { display: flex; gap: 4px; }
   #view-list button { flex-direction: column; gap: 3px; padding: 6px 10px; width: auto; min-width: 66px; font-size: 11.5px; text-align: center; white-space: nowrap; }
   #dispenser-panel { top: auto; right: 8px; left: 8px; bottom: 82px; width: auto; max-height: 46vh; }

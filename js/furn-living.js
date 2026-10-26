@@ -1,8 +1,9 @@
 import * as THREE from 'three';
 import { CM, box } from './core.js';
-import { rbox, bx, led, curtain } from './furn-common.js';
+import { rbox, bx, led } from './furn-common.js';
+import { softMesh } from './soft.js';
 import { acUnit } from './furn-rooms-a.js';
-import { discLamp, smartPanel, mushroomLamp, teddy, kettleSet, airPurifier, booksAlongY, roundedPanel, pawHoles } from './decor.js';
+import { discLamp, smartPanel, roundedPanel, pawHoles } from './decor.js';
 
 const S = (m, c = true, r = true) => { m.castShadow = c; m.receiveShadow = r; return m; };
 
@@ -26,12 +27,8 @@ export function buildLiving(M, ctx) {
     g.add(bx(CX1 - 0.4, Y0 + i * mod + 1.2, CX1 + 1.8, Y0 + (i + 1) * mod - 1.2, 26.6, 40, { all: M.oak }));
     g.add(bx(CX1 + 1.8, Y0 + i * mod + 12, CX1 + 2.6, Y0 + (i + 1) * mod - 12, 37.4, 38.6, { all: blk }, { cast: false }));
   }
-  g.add(booksAlongY(M, 283, Y0 + mod + 3, Y0 + 2 * mod - 3, 10.5, 12.5, 4, 22));
-  g.add(booksAlongY(M, 283, Y0 + 2 * mod + 3, Y0 + 3 * mod - 3, 10.5, 12.5, 5, 22));
-  g.add(teddy(M, 284, 130, 44));
-  g.add(mushroomLamp(M, 284, 292, 44, ctx));
 
-  // ---- tall black cabinet with two arched oak doors, tray + kettle on top (y 333..413)
+  // ---- tall black cabinet with two arched oak doors(y 333..413)
   g.add(bx(CX0, 333, CX1, 413, 0, 94, { all: blk }));
   g.add(bx(CX1 - 0.4, 334, CX1 + 0.4, 412, 6, 27, { all: M.shadowGap }, { cast: false }));
   for (let i = 0; i < 2; i++) {
@@ -39,7 +36,6 @@ export function buildLiving(M, ctx) {
     d.position.set(CX1 * CM, 28.6 * CM, (334.4 + i * 39.4) * CM);
     g.add(d);
   }
-  g.add(kettleSet(M, 285, 373, 94));
 
   // ---- 65" TV and black floating shelves
   const tv = new THREE.Group();
@@ -51,9 +47,6 @@ export function buildLiving(M, ctx) {
   g.add(tv); ctx.tv = scr;
   g.add(bx(262, 262, 284, 372, 175, 178, { all: blk }));
   g.add(bx(262, 310, 282, 366, 133, 136, { all: blk }));
-  g.add(S(rbox(272, 345, 14, 12, 136, 152, M.ceramic, 3, 3)));
-  g.add(S(rbox(272, 330, 12, 8, 178, 192, M.oakDark, 2, 3)));
-  g.add(S(rbox(272, 300, 6, 30, 178, 186, M.fabricGrey, 1, 2)));
   g.add(led(M, 264, 100, 264, 330, 262, 1.4));
   ctx.colliders.push([262, 95, 309, 413]);
 
@@ -76,11 +69,8 @@ export function buildLiving(M, ctx) {
   // arched dark mirror on the entry wall
   { const m = roundedPanel({ w: 40, h: 112, rTop: 20, thick: 1.2, face: 'W', mat: M.mirrorDark }); m.position.set(597.85 * CM, 70 * CM, 505 * CM); g.add(m); }
 
-  // ---- windows: floor length grey sheer curtains, A/C, air purifier
-  g.add(curtain(M, { axis: 'x', a: 272, b: 588, c: 6, zTop: 258, zBottom: 1, panelW: 163, mat: M.curtainGrey }));
-  g.add(acUnit(M, 426, 14, 84, 218, false));
-  g.add(airPurifier(M, 500, 52));
-  ctx.colliders.push([480, 32, 520, 72]);
+  // ---- windows: curtains come from curtains.js; A/C unit above the window
+    g.add(acUnit(M, 426, 14, 84, 218, false));
 
   // ---- shoe cabinet (4 oak doors, cat-paw cut-outs), floor to ceiling
   {
@@ -96,24 +86,30 @@ export function buildLiving(M, ctx) {
   return g;
 }
 
+/**
+ * Recommended sofa: 3-seat "slim track arm" sofa, 230 x 85 cm (fits the drawing), seat height 42 cm,
+ * 14 cm tapered oak legs (a robot vacuum fits underneath), tech fabric that resists cat claws and wipes clean.
+ * The fabric colour is switchable through M.sofaFabric.color.
+ */
 export function sofa(M, cx, cy) {
   const g = new THREE.Group();
-  const X0 = cx - 42, Y0 = cy - 115;
-  [[X0 + 9, Y0 + 10], [X0 + 9, Y0 + 220], [X0 + 75, Y0 + 10], [X0 + 75, Y0 + 220]].forEach(([x, y]) => {
-    const l = S(new THREE.Mesh(new THREE.CylinderGeometry(2.2 * CM, 1.1 * CM, 14 * CM, 10), M.blackMetal));
-    l.position.set(x * CM, 7 * CM, y * CM); g.add(l);
+  const Y0 = cy - 115, Y1 = cy + 115, F = M.sofaFabric;
+  const add = (opts, x, y, zc, rot) => g.add(softMesh(opts, F, x, y, zc, rot));
+  // tapered oak legs, slightly splayed
+  [[cx - 32, Y0 + 12], [cx - 32, Y1 - 12], [cx + 32, Y0 + 12], [cx + 32, Y1 - 12]].forEach(([x, y]) => {
+    const l = S(new THREE.Mesh(new THREE.CylinderGeometry(2.6 * CM, 1.5 * CM, 14.5 * CM, 14), M.sofaLeg));
+    l.position.set(x * CM, 7.2 * CM, y * CM);
+    l.rotation.set(((y > cy ? 1 : -1) * 0.07), 0, ((x > cx ? -1 : 1) * 0.07)); g.add(l);
   });
-  g.add(S(rbox(cx, cy, 84, 230, 13, 34, M.sofaGreen, 3, 4)));
-  g.add(S(rbox(cx, Y0 + 9, 84, 18, 13, 62, M.sofaGreen, 3, 4)));
-  g.add(S(rbox(cx, Y0 + 221, 84, 18, 13, 62, M.sofaGreen, 3, 4)));
-  g.add(S(rbox(cx + 36, cy, 12, 212, 34, 80, M.sofaGreen, 3, 4)));
-  const sw = (230 - 36) / 2;
-  for (let i = 0; i < 2; i++) g.add(S(rbox(cx - 7, Y0 + 18 + sw * (i + 0.5), 60, sw - 1, 34, 49, M.boucle, 6, 5)));
-  const bw = (230 - 36) / 3;
-  for (let i = 0; i < 3; i++) {
-    const b = rbox(cx + 25, Y0 + 18 + bw * (i + 0.5), 22, bw - 1.5, 49, 90, M.boucle, 8, 5);
-    b.rotation.z = 0.2; b.position.x += 4 * CM; g.add(S(b));
+  add({ w: 82, h: 18, d: 226, r: 4, fold: 0.15 }, cx, cy, 23);                                // base rail
+  add({ w: 84, h: 52, d: 13, r: 6, fold: 0.25 }, cx, Y0 + 6.5, 40);                           // arms
+  add({ w: 84, h: 52, d: 13, r: 6, fold: 0.25, seed: 3 }, cx, Y1 - 6.5, 40);
+  add({ w: 20, h: 56, d: 204, r: 7, fold: 0.3 }, cx + 31, cy, 56);                            // back frame
+  const span = 204, n = 3, sw = span / n;
+  for (let i = 0; i < n; i++) {
+    const y = Y0 + 13 + sw * (i + 0.5);
+    add({ w: 62, h: 15, d: sw - 1.2, r: 5.5, fold: 0.35, crown: 1.6, seed: i * 2 }, cx - 8, y, 37.5);   // seat cushions
+    add({ w: 19, h: 42, d: sw - 1.2, r: 8, fold: 0.5, crown: 1.2, seed: i * 2 + 1 }, cx + 13.5, y, 67, { z: -0.2 }); // back cushions, relaxed recline
   }
-  const p = rbox(cx + 6, Y0 + 40, 13, 42, 49, 90, M.tealCushion, 6, 5); p.rotation.set(0.08, 0.1, 0.22); g.add(S(p));
   return g;
 }

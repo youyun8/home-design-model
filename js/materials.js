@@ -23,21 +23,27 @@ export async function buildMaterials(onProgress = () => {}) {
     const t = T.hexTile();
     M.floorHex = std({ map: t.map, bumpMap: t.bump, bumpScale: 1.4, roughness: 0.5, envMapIntensity: 0.5 });
   });
-  step('水磨石', () => {
-    const calm = [[188, 182, 172], [220, 215, 207], [198, 190, 178], [174, 168, 160], [210, 203, 192]];
-    const f = T.terrazzo({ tileW: 0.6, tileH: 0.6, cols: 2, rows: 2, seed: 3, density: 3800, base: [207, 201, 192], chips: calm, chipScale: 0.8 });
-    M.floorTerrazzo = std({ map: f.map, bumpMap: f.bump, bumpScale: 0.6, roughness: 0.4, envMapIntensity: 0.7 });
-    const w = T.terrazzo({ tileW: 1.0, tileH: 0.35, cols: 1, rows: 2, seed: 6, density: 1700, base: [212, 206, 197], chips: calm, chipScale: 0.9 });
-    M.wallTerrazzo = std({ map: w.map, bumpMap: w.bump, bumpScale: 0.5, roughness: 0.34, envMapIntensity: 0.7 });
-    const a = T.terrazzo({
-      tileW: 1.0, tileH: 0.35, cols: 1, rows: 2, seed: 12, density: 1500, base: [226, 218, 204], chipScale: 1.5,
-      chips: [[196, 104, 74], [70, 128, 126], [214, 170, 72], [62, 62, 68], [222, 158, 148], [238, 232, 220]],
-    });
-    M.wallTerrazzoAccent = std({ map: a.map, bumpMap: a.bump, bumpScale: 0.6, roughness: 0.3, envMapIntensity: 0.7 });
+  step('浴室磁磚', () => {
+    // 照片：地面為淺灰米水磨石感大磚＋細黑縫；牆面為亮面白色大磚；彩色水磨石為跳色長條
+    const f = T.speckleTile({ tw: 0.6, th: 0.6, cols: 2, rows: 2, seed: 21 });
+    M.floorTerrazzo = std({ map: f.map, bumpMap: f.bump, bumpScale: 0.5, roughness: 0.34, envMapIntensity: 0.8 });
+    const w = T.bathWallTile({});
+    M.wallTerrazzo = phys({ map: w.map, roughness: 0.16, clearcoat: 0.5, clearcoatRoughness: 0.12, envMapIntensity: 1.0 });
+    const a = T.terrazzoAccent({});
+    M.wallTerrazzoAccent = phys({ map: a.map, roughness: 0.2, clearcoat: 0.4, clearcoatRoughness: 0.15, envMapIntensity: 0.9 });
   });
-  step('balcony tile', () => {
-    const t = T.terrazzo({ tileW: 0.3, tileH: 0.3, cols: 4, rows: 4, seed: 21, density: 1800, base: [118, 118, 120], chips: [[96, 96, 98], [140, 138, 134], [80, 80, 84]], grout: [90, 90, 92], chipScale: 0.8 });
-    M.floorBalcony = std({ map: t.map, bumpMap: t.bump, bumpScale: 0.6, roughness: 0.75 });
+  step('陽台', () => {
+    // 照片：深灰長條磚牆、淺灰長條磚牆、鋁條天花、淺灰地磚
+    const bd = T.stickBrick({ base: [74, 73, 72], grout: [92, 92, 90], var_: 12 });
+    M.brickDark = std({ map: bd.map, bumpMap: bd.bump, bumpScale: 1.6, roughness: 0.7, envMapIntensity: 0.5 });
+    const bl = T.stickBrick({ base: [196, 196, 193], grout: [128, 126, 122], var_: 7, ridged: false, seed: 9 });
+    M.brickLight = std({ map: bl.map, bumpMap: bl.bump, bumpScale: 1.2, roughness: 0.5, envMapIntensity: 0.6 });
+    const sc = T.slatCeiling();
+    M.alumCeiling = std({ map: sc.map, roughness: 0.45, metalness: 0.35, envMapIntensity: 0.9 });
+    const bf = T.speckleTile({ tw: 0.3, th: 0.3, cols: 4, rows: 4, base: [196, 195, 191], speck: [[222, 221, 216], [168, 166, 160], [180, 178, 172]], grout: [138, 136, 132], gw: 0.004, density: 4200, seed: 41 });
+    M.floorBalcony = std({ map: bf.map, bumpMap: bf.bump, bumpScale: 0.5, roughness: 0.62, envMapIntensity: 0.6 });
+    M.railing = std({ color: 0x4b4e53, roughness: 0.45, metalness: 0.7, envMapIntensity: 1.0 });
+    M.louvre = std({ color: 0x8e9195, roughness: 0.38, metalness: 0.75, envMapIntensity: 1.1 });
   });
 
   // ---- walls -----------------------------------------------------------------------------
@@ -52,9 +58,11 @@ export async function buildMaterials(onProgress = () => {}) {
     M.exterior = std({ map: e.map, bumpMap: e.bump, bumpScale: 0.6, roughness: 0.95, envMapIntensity: 0.6 });
     M.concreteDark = std({ color: 0x8b8c8d, roughness: 0.98 });
   });
-  step('廚房壁磚', () => {
-    const t = T.wallTile({});
-    M.wallKitchenTile = std({ map: t.map, bumpMap: t.bump, bumpScale: 0.5, roughness: 0.28, envMapIntensity: 0.8 });
+  step('廚具', () => {
+    // 照片：白色無把手平面門板、黑色踢腳、深灰玻璃壁板、細長排油煙機
+    M.cabinetWhite = std({ color: 0xf1efeb, roughness: 0.42, envMapIntensity: 0.6 });
+    M.glassBacksplash = phys({ color: 0x4c4f52, roughness: 0.06, metalness: 0.1, clearcoat: 1, clearcoatRoughness: 0.04, envMapIntensity: 1.5 });
+    M.hoodWhite = phys({ color: 0xeceae6, roughness: 0.3, clearcoat: 0.5, envMapIntensity: 0.9 });
   });
 
   // ---- wood, laminate, stone, metals ------------------------------------------------------
@@ -75,7 +83,6 @@ export async function buildMaterials(onProgress = () => {}) {
     M.charcoal = std({ color: 0x38332f, roughness: 0.85 });
     M.blackCabinet = std({ color: 0x1d1d1f, roughness: 0.62, envMapIntensity: 0.6 });
     M.mirrorDark = std({ color: 0x3a383d, roughness: 0.05, metalness: 1, envMapIntensity: 1.5 });
-    M.paintSage = std({ color: 0x7c8668, roughness: 0.9 });
     M.bronze = std({ color: 0x6b5a45, roughness: 0.35, metalness: 0.85, envMapIntensity: 1.1 });
     M.steel = std({ color: 0xc8cbcf, roughness: 0.28, metalness: 1, envMapIntensity: 1.2 });
     M.chrome = std({ color: 0xffffff, roughness: 0.06, metalness: 1, envMapIntensity: 1.4 });

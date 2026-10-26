@@ -43,6 +43,9 @@ export function setupUI(app, nav) {
     lighting.setTime(b.dataset.time); setSeg(timeSeg, 'time', b.dataset.time); syncLights();
   });
   lightsBtn.addEventListener('click', () => { lighting.setLights(!lighting.lightsOn); syncLights(); });
+  const curtainBtn = $('#btn-curtain');
+  curtainBtn.addEventListener('click', () => app.curtains.toggle());
+  app.curtains.onChange = (closed) => { curtainBtn.setAttribute('aria-pressed', String(closed)); curtainBtn.textContent = closed ? '窗簾（已拉上）' : '窗簾'; };
   $('#btn-ceiling').addEventListener('click', (e) => {
     ui.showCeiling = !ui.showCeiling; e.currentTarget.setAttribute('aria-pressed', String(ui.showCeiling)); app.showCeiling = ui.showCeiling;
   });
@@ -76,6 +79,13 @@ export function setupUI(app, nav) {
       ui.autoXray = false;
       if (v.key === 'dispenser') panel.open(); else if (panel.el.hidden === false && !panel.pinned) panel.close();
     }
+  });
+  // recommended sofa colour options
+  const sofaColors = { oat: 0xcdbfa8, olive: 0x56613f, charcoal: 0x4f5054 };
+  $('#sofa-colors').addEventListener('click', (e) => {
+    const b = e.target.closest('button'); if (!b) return;
+    app.M.sofaFabric.color.setHex(sofaColors[b.dataset.c]);
+    $$('#sofa-colors button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
   });
   // per-room light switches
   const rl = $('#room-lights');

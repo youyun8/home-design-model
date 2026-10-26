@@ -3,7 +3,7 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
 import { CM, box } from './core.js';
 import { rbox, bx } from './furn-common.js';
 import { labelCanvas, canvasTex } from './textures.js';
-import { COUNTER_TOP } from './furn-rooms-b.js';
+import { COUNTER_TOP } from './furn-kitchen.js';
 
 // ================================================================================================
 // 賀眾牌 桌上型冰溫熱飲水機 (UW-672AW-1) / 溫熱 (UR-672BW-1)  — W 32 x D 48 x H 52 cm
@@ -52,7 +52,8 @@ export function buildDispenserSystem(M, ctx, helpers) {
   statics.add(bx(X1 - 1.6, Y0, X1, Y1, 10, 89.9, { all: M.cabinetInterior }));              // east side
   statics.add(bx(X0 + 4, Y0 + 4, X1, Y1, 0, 10, { all: M.shadowGap }, { cast: false }));    // plinth
   // top rails (front)
-  statics.add(bx(X0, Y1 - 4, X1, Y1, 86, 89.9, { all: M.laminateWarm }));
+  statics.add(bx(X0, Y1 - 4, X1, Y1, 86, 89.9, { all: M.cabinetWhite }));
+  statics.add(bx(X0, Y1 - 1, X1, Y1 + 2, 88.6, 89.9, { all: M.blackMatte }, { cast: false }));   // black reveal under the counter like the rest of the run
   // countertop with sink cut-out (x 181..237, y 354..394)
   const SK = { x0: 181, x1: 237, y0: 354, y1: 394 };
   const q = (a, b, c, d) => statics.add(bx(a, b, c, d, 89.9, COUNTER_TOP, { all: M.quartz }));
@@ -104,11 +105,12 @@ export function buildDispenserSystem(M, ctx, helpers) {
     const d = helpers.swingDoor({
       id, name, hinge, width, height: 77, thick: 1.8, closed, open, group: dyn,
       build: (leaf, o) => {
-        const m = new THREE.Mesh(new THREE.BoxGeometry(o.width * CM, o.height * CM, o.thick * CM), M.laminateWarm);
-        m.position.set((o.width / 2) * CM, (o.height / 2 + 11) * CM, 0); S(m); leaf.add(m);
-        const pull = new THREE.Mesh(new THREE.BoxGeometry(1.2 * CM, 24 * CM, 1.4 * CM), M.blackMetal);
-        pull.position.set((o.width - 6) * CM, (o.height - 16) * CM, (o.thick / 2 + 0.8) * CM);
-        leaf.add(pull);
+        const m = new THREE.Mesh(new THREE.BoxGeometry(o.width * CM, (o.height - 0.6) * CM, o.thick * CM), M.cabinetWhite);
+        m.position.set((o.width / 2) * CM, ((o.height - 0.6) / 2 + 11) * CM, 0); S(m); leaf.add(m);
+        // handleless: black grip slot along the top edge
+        const slot = new THREE.Mesh(new THREE.BoxGeometry((o.width - 1.6) * CM, 2.4 * CM, 0.3 * CM), M.blackMatte);
+        slot.position.set((o.width / 2) * CM, (o.height + 10.2 - 1.8) * CM, (o.thick / 2 + 0.1) * CM);
+        leaf.add(slot);
       },
     });
     d.cabinet = true; api.doors.push(d);

@@ -71,6 +71,9 @@ async function boot() {
   lighting.setTime(['day', 'dusk', 'night'].includes(params.get('time')) ? params.get('time') : 'day');
   if (params.has('lights')) lighting.setLights(params.get('lights') === '1');
 
+  app.curtains.onProgress = (k) => lighting.setCurtainK(k);
+  if (params.get('curtains') === '1') { app.curtains.setClosed(true); app.curtains.t = 1; app.curtains.update(0.001); app.curtains.items.forEach((i) => i.anim.forEach((f) => f(1))); lighting.setCurtainK(1); }
+
   // lit lamps follow the light switch
   app.refreshLamps = () => (app.lamps || []).forEach((m) => { m.material.emissiveIntensity = lighting.lightsOn ? 1.3 : 0; });
   app.refreshLamps();
@@ -193,6 +196,7 @@ async function boot() {
     }
     nav.update(dt);
     arch.doors.forEach((d) => d.update(dt));
+    app.curtains.update(dt);
     app.dispenser.update(dt);
     app.updateTV?.(dt);
     ui.update(dt);

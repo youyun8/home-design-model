@@ -39,6 +39,7 @@
         <button data-time="night">夜晚</button>
       </div>
       <button id="btn-lights" class="chip" aria-pressed="false" title="開關全室燈光">燈光</button>
+      <button id="btn-curtain" class="chip" aria-pressed="false" title="拉上／拉開遮光窗簾">窗簾</button>
       <button id="btn-ceiling" class="chip" aria-pressed="false" title="環景模式下顯示天花板">天花板</button>
       <label class="sel" title="畫質"><select id="sel-quality" aria-label="畫質"><option value="high">高畫質</option><option value="medium">中</option><option value="low">省電</option></select></label>
       <button id="btn-help" class="chip round" aria-label="操作說明">?</button>
@@ -49,6 +50,22 @@
   <aside id="views" class="glass">
     <h2>空間視角</h2>
     <ul id="view-list"></ul>
+    <details id="spec-box" open>
+      <summary>推薦款式</summary>
+      <div class="spec">
+        <b>沙發</b>
+        <p>3 人座直線窄扶手，230×85 cm，座高 42、腳高 14 cm（掃地機可入），科技布耐貓抓、可擦拭。</p>
+        <div id="sofa-colors" class="swatches" role="group" aria-label="沙發顏色">
+          <button data-c="oat" style="--c:#cdbfa8" aria-pressed="true" title="燕麥米（推薦）"></button>
+          <button data-c="olive" style="--c:#56613f" aria-pressed="false" title="橄欖綠（效果圖）"></button>
+          <button data-c="charcoal" style="--c:#4f5054" aria-pressed="false" title="炭灰"></button>
+        </div>
+        <b>床</b>
+        <p>低矮懸浮橡木床架 + 22 cm 獨立筒床墊，棉麻床包與燕麥被；牆面已有橡木床頭板，不另購床頭。</p>
+        <b>窗簾</b>
+        <p>臥室、客廳：蛇形雙層簾（100% 遮光布 + 薄紗），軌道在窗頂，兩側各蓋過窗框 10 到 15 cm。書房：遮光蜂巢簾。</p>
+      </div>
+    </details>
     <details id="room-lights-box">
       <summary>各房間燈光</summary>
       <div id="room-lights"></div>

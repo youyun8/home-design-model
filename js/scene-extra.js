@@ -3,8 +3,10 @@ import { addExtraMaterials } from './furn-common.js';
 import { buildBedroom } from './furn-bedroom.js';
 import { buildLiving } from './furn-living.js';
 import { buildStudy } from './furn-study.js';
-import { buildKitchen, buildBath, buildBalcony } from './furn-rooms-b.js';
+import { buildKitchen } from './furn-kitchen.js';
+import { buildBath, buildBalcony } from './furn-rooms-b.js';
 import { addDecorMaterials } from './decor.js';
+import { buildCurtains } from './curtains.js';
 import { buildDispenserSystem } from './dispenser.js';
 
 /** Adds furniture, cabinetry and the water dispenser system to the scene. */
@@ -34,6 +36,7 @@ export default async function addExtras(app, progress) {
   const disp = buildDispenserSystem(M, ctx, arch.helpers);
   rooms.kitchen.add(disp.staticGroup);
   scene.add(disp.dynGroup);
+  app.curtains = buildCurtains(M, arch);
   app.furniture = { root: furniture, rooms };
   app.dispenser = disp.api;
   app.lamps = ctx.lamps;

@@ -97,7 +97,7 @@ export function createLighting({ scene, renderer, M, quality, ceilings }) {
     const sky = skyFor(kind);
     scene.background = sky.tex;
     scene.environment = roomEnv;
-    scene.environmentIntensity = t.env;
+    scene.environmentIntensity = t.env * (1 - 0.58 * L.curtainK * (kind === 'night' ? 0.25 : 1));
     // glass shows the outdoor sky; everything else uses the neutral interior environment
     scene.traverse((o) => {
       if (!o.isMesh) return;
@@ -107,12 +107,20 @@ export function createLighting({ scene, renderer, M, quality, ceilings }) {
     sun.color.set(t.sunColor);
     sun.intensity = t.sunI;
     sun.position.copy(center).addScaledVector(t.sun, 20);
-    hemi.intensity = t.hemi;
+    hemi.intensity = t.hemi * (1 - 0.58 * L.curtainK * (kind === 'night' ? 0.25 : 1));
     renderer.toneMappingExposure = t.exposure;
     L.bloom = t.bloom;
     if (!keepLights) L.lightsOn = kind !== 'day';
     refreshSpots();
   };
+  // closed blackout curtains cut the daylight that reaches the room (sun is blocked by their shadows already)
+  L.curtainK = 0;
+  L.applyAmbient = () => {
+    const t = TIMES[L.time], night = L.time === 'night';
+    const f = 1 - 0.58 * L.curtainK * (night ? 0.25 : 1);
+    scene.environmentIntensity = t.env * f; hemi.intensity = t.hemi * f;
+  };
+  L.setCurtainK = (k) => { L.curtainK = k; L.applyAmbient(); };
   L.setLights = (on) => { L.lightsOn = on; refreshSpots(); };
   L.setRoom = (id, on) => { L.roomOn[id] = on; refreshSpots(); };
   L.sun = sun;
