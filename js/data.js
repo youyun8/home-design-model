@@ -65,7 +65,7 @@ export const VIEWS = [
   {
     key: 'living-sofa', name: '客廳・沙發背牆', mode: 'walk', icon: '▤',
     pos: [346, 215, 152], target: [598, 232, 112],
-    text: '橄欖綠絨布沙發，背牆是橡木壁板、圓形壁燈與觸控面板，橄欖綠橫梁連接書房，旁邊是衛浴門。',
+    text: '橄欖綠絨布沙發，背牆為玫瑰白，配橡木壁板、圓形壁燈與觸控面板，通道另一側是書房，旁邊是衛浴門。',
   },
   {
     key: 'kitchen', name: '廚房', mode: 'walk', icon: '♨',

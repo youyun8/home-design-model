@@ -70,8 +70,8 @@ export async function buildMaterials(onProgress = () => {}) {
     M.quartz = phys({ color: 0xe9e6e0, roughness: 0.28, clearcoat: 0.2, clearcoatRoughness: 0.3, envMapIntensity: 0.9 });
     M.blackMetal = std({ color: 0x161617, roughness: 0.42, metalness: 0.7, envMapIntensity: 1 });
     M.blackMatte = std({ color: 0x1b1b1c, roughness: 0.7, metalness: 0.2 });
-    M.plum = std({ color: 0x4a3140, roughness: 0.5, metalness: 0.1, envMapIntensity: 0.6 });
-    M.plumLine = std({ color: 0x32202b, roughness: 0.6 });
+    M.plum = std({ color: 0x5c3a4c, roughness: 0.42, metalness: 0.05, envMapIntensity: 0.9 });
+    M.plumLine = std({ color: 0x4a2f3f, roughness: 0.6 });
     M.charcoal = std({ color: 0x38332f, roughness: 0.85 });
     M.blackCabinet = std({ color: 0x1d1d1f, roughness: 0.62, envMapIntensity: 0.6 });
     M.mirrorDark = std({ color: 0x3a383d, roughness: 0.05, metalness: 1, envMapIntensity: 1.5 });

@@ -114,12 +114,10 @@ export function buildArchitecture(M) {
   // living east wall (x 598..610): study opening (folding glass door), bath door
   wall([598, 0, 610, 376], { n: Wh, s: Wh, e: Wh, w: Wh, jamb: M.blackMatte }, [{ a: 5, b: 272, sill: 0, head: 223 }]);
   wall([598, 376, 610, 585], { n: Wh, s: Wh, e: Tz, w: Wh, jamb: M.blackMatte }, [{ a: 377, b: 465, sill: 0, head: 215 }]);
-  // entry side of the wall (y 465..585) is dark cement paint like the TV wall
-  groups.walls.add(box(597.9, 465, 598.05, 585, 0, 270, { w: Pl, e: Pl, all: Pl }, { cast: false }));
   // study | bath divider
   wall([610, 357, 878, 376], { n: Wh, s: Tz, e: Wh, w: Wh });
   // bath structural column (SW) and alcove walls
-  groups.walls.add(box(598, 500, 714, 585, 0, SLAB, { n: Tz, e: Tz, s: Wh, w: Pl, t: M.slabConcrete, b: M.slabConcrete }));
+  groups.walls.add(box(598, 500, 714, 585, 0, SLAB, { n: Tz, e: Tz, s: Wh, w: Wh, t: M.slabConcrete, b: M.slabConcrete }));
   colliders.push([598, 500, 714, 585]);
 
   // -------------------------------------------------------------------------------------------
@@ -413,7 +411,9 @@ export function buildArchitecture(M) {
   // bedroom door frame on living side, bath door frame (black), entry frame
   casing(261.4, 3, 262.6, 5, 219, M.blackMatte); casing(261.4, 95, 262.6, 97, 219, M.blackMatte);
   casing(603.6, 375, 612, 377, 216, M.blackMetal); casing(603.6, 465, 612, 467, 216, M.blackMetal); groups.walls.add(box(603.6, 375, 612, 467, 215, 217, { all: M.blackMetal }, { cast: false }));
-  casing(460, 585, 574.5, 587, 223, M.blackMatte);
+  // entry door frame: two jambs and a head (the opening itself stays clear for the door leaf)
+  casing(460, 585, 463, 588, 223, M.blackMatte); casing(571.5, 585, 574.5, 588, 223, M.blackMatte);
+  groups.walls.add(box(460, 585, 574.5, 588, 219.8, 223, { all: M.blackMatte }, { cast: false }));
 
   return { root, groups, colliders, wallRects, doors, helpers: { swingDoor, slideDoor, makeDoor, leafBox, tag } };
 }

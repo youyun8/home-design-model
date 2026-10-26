@@ -61,13 +61,10 @@ export function buildLiving(M, ctx) {
   g.add(sofa(M, 537, 200));
   ctx.colliders.push([495, 84, 582, 316]);
 
-  // ---- study side partition (x = 598): oak wall panel, ribbed-glass slit, mirror, round wall light, smart panel
+  // ---- sofa wall (x = 598, rose white): oak wall panel, ribbed-glass slit, mirror, round wall light, smart panel
   const WX = 598;
-  g.add(bx(WX - 0.5, 0, WX, 297, 223, 280, { all: M.paintSage }));        // olive beam above the study opening
-  g.add(bx(WX - 0.5, 297, WX, 357, 225, 280, { all: M.paintSage }));
-  g.add(bx(WX - 0.5, 357, WX, 465, 215, 252, { all: M.paintSage }));
   g.add(bx(WX - 2.2, 297, WX, 357, 0, 225, { all: M.oak }));
-  g.add(bx(WX - 3, 272, WX - 0.2, 297, 0, 225, { all: M.charcoal }));
+  g.add(bx(WX - 3, 272, WX - 0.2, 297, 0, 225, { all: M.wallWhite }));
   g.add(bx(WX - 3.4, 272, WX - 2.2, 274.4, 0, 225, { all: M.blackMetal }));
   g.add(bx(WX - 3.4, 294.6, WX - 2.2, 297, 0, 225, { all: M.blackMetal }));
   g.add(bx(WX - 3.4, 272, WX - 2.2, 297, 222.6, 225, { all: M.blackMetal }));
