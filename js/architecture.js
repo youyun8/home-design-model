@@ -54,6 +54,7 @@ export function buildArchitecture(M) {
       piece(cur, o.a, z0, z1, firstEnd, true, true);
       if (o.sill > z0) piece(o.a, o.b, z0, o.sill, true, true, o.sill > 40);
       if (o.head < z1) piece(o.a, o.b, o.head, z1, true, true, false);
+      if (o.win && o.sill <= 40) colliders.push(alongX ? [o.a, y0, o.b, y1] : [x0, o.a, x1, o.b]);
       cur = o.b; firstEnd = true;
     }
     piece(cur, hi, z0, z1, firstEnd, false, true);
@@ -63,9 +64,9 @@ export function buildArchitecture(M) {
 
   // --- north façade (group N) with three window openings
   wall([-172, -15, 876, 0], { n: Ex, s: Wh, e: Ex, w: Ex, jamb: Wh }, [
-    { a: -152, b: 122, sill: 90, head: 225 },
-    { a: 272, b: 588, sill: 90, head: 225 },
-    { a: 715, b: 858, sill: 90, head: 225 },
+    { a: -152, b: 122, sill: 4, head: 238, win: true },
+    { a: 272, b: 588, sill: 4, head: 258, win: true },
+    { a: 715, b: 858, sill: 14, head: 228, win: true },
   ], { group: groups.N });
   // exterior structural blocks / AC window box on the north side
   const blocks = [
@@ -82,7 +83,7 @@ export function buildArchitecture(M) {
   colliders.push([-172, -15, 876, 0]);
 
   // --- west façade (group W)
-  wall([-172, 0, -157, 342], { n: Ex, s: Ex, e: Wh, w: Ex, jamb: Wh }, [{ a: 64, b: 190, sill: 90, head: 225 }], { group: groups.W });
+  wall([-172, 0, -157, 342], { n: Ex, s: Ex, e: Wh, w: Ex, jamb: Wh }, [{ a: 64, b: 190, sill: 4, head: 238, win: true }], { group: groups.W });
   wall([-193, 342, -178, 600], { n: Ex, s: Ex, e: M.laminateWhite, w: Ex, jamb: M.laminateWhite }, [{ a: 372, b: 560, sill: 90, head: 222 }], { group: groups.W });
   groups.W.add(box(-200, -100, -160, 0, 0, SLAB + 20, { all: M.concreteDark }));
   groups.W.add(box(-200, 500, -178, 600, 0, SLAB + 20, { all: M.concreteDark }));
@@ -90,7 +91,7 @@ export function buildArchitecture(M) {
   // --- south façade (group S)
   wall([-193, 585, -16, 600], { n: M.laminateWhite, s: Ex, e: Ex, w: Ex }, [], { group: groups.S });
   wall([-16, 585, 262, 600], { n: Wh, s: Ex, e: Ex, w: Ex }, [], { group: groups.S });
-  wall([262, 585, 598, 600], { n: Wh, s: Ex, e: Ex, w: Ex, jamb: Wh }, [{ a: 462, b: 574, sill: 0, head: 222 }], { group: groups.S });
+  wall([262, 585, 598, 600], { n: Pl, s: Ex, e: Ex, w: Ex, jamb: Wh }, [{ a: 462, b: 574, sill: 0, head: 222 }], { group: groups.S });
   wall([598, 585, 930, 600], { n: Tz, s: Ex, e: Ex, w: Ex }, [], { group: groups.S });
 
   // --- east façade (group E)
@@ -108,16 +109,13 @@ export function buildArchitecture(M) {
   // kitchen west wall with balcony door
   wall([-16, 342, 0, 585], { n: Wh, s: Wh, e: Kt, w: M.laminateWhite, jamb: M.laminateWhite }, [{ a: 414, b: 500, sill: 0, head: 215 }]);
   // TV wall / kitchen east wall (x 252..262)
-  wall([252, 0, 262, 342], { n: Wh, s: Wh, e: Pl, w: Wh, jamb: Pl }, [{ a: 5, b: 95, sill: 0, head: 218 }]);
+  wall([252, 0, 262, 342], { n: Wh, s: Wh, e: Pl, w: Wh, jamb: M.blackMatte }, [{ a: 5, b: 95, sill: 0, head: 218 }]);
   wall([252, 342, 262, 585], { n: Wh, s: Wh, e: Pl, w: Kt, jamb: M.blackMatte }, [{ a: 413, b: 497, sill: 0, head: 215 }]);
-  // living east wall (x 598..610): study folding door, bath door
-  wall([598, 0, 610, 585], { n: Wh, s: Wh, e: Tz, w: Wh, jamb: M.blackMatte }, [
-    { a: 5, b: 272, sill: 0, head: 223 },
-    { a: 377, b: 465, sill: 0, head: 215 },
-  ]);
-  // overwrite finishes of the living-side face where the drawings call for 司曼特 / study side white
+  // living east wall (x 598..610): study opening (folding glass door), bath door
+  wall([598, 0, 610, 376], { n: Wh, s: Wh, e: Wh, w: Wh, jamb: M.blackMatte }, [{ a: 5, b: 272, sill: 0, head: 223 }]);
+  wall([598, 376, 610, 585], { n: Wh, s: Wh, e: Tz, w: Wh, jamb: M.blackMatte }, [{ a: 377, b: 465, sill: 0, head: 215 }]);
+  // entry side of the wall (y 465..585) is dark cement paint like the TV wall
   groups.walls.add(box(597.9, 465, 598.05, 585, 0, 270, { w: Pl, e: Pl, all: Pl }, { cast: false }));
-  groups.walls.add(box(610, 272, 610.1, 357, 0, 270, { e: Wh, w: Wh, all: Wh }, { cast: false }));
   // study | bath divider
   wall([610, 357, 878, 376], { n: Wh, s: Tz, e: Wh, w: Wh });
   // bath structural column (SW) and alcove walls
@@ -169,10 +167,8 @@ export function buildArchitecture(M) {
   ceil([-193, 342, -16, 585], 240);
   ceil([610, 376, 878, 500], 240); ceil([878, 448, 914, 585], 240); ceil([714, 500, 878, 585], 240);
   // curtain boxes along the north windows (實內 25cm)
-  const drop = (r, zBottom, zTop) => groups.ceilings.add(box(r[0], r[1], r[2], r[3], zBottom, zTop, { all: M.ceilingWhite }, { cast: false }));
-  drop([-157, 0, 130, 25], 247, 270);
+  const drop = (r, zBottom, zTop, mat = M.ceilingWhite) => groups.ceilings.add(box(r[0], r[1], r[2], r[3], zBottom, zTop, { all: mat }, { cast: false }));
   drop([262, 0, 598, 25], 262, 280);
-  drop([610, 0, 862, 25], 247, 270);
   // soffit step face at y = 325 (ducted A/C zone) with LED cove
   drop([262, SOFFIT.y0 - 4, 598, SOFFIT.y0], SOFFIT.h, 280);
   groups.ceilings.add(box(262, SOFFIT.y0 - 3.5, 598, SOFFIT.y0 - 3, SOFFIT.h + 1, SOFFIT.h + 2.5, { all: M.ledWarm }, { cast: false, receive: false }));
@@ -184,10 +180,13 @@ export function buildArchitecture(M) {
     groups.ceilings.add(box(a, 340, a + 0.8, 445, SOFFIT.h - 0.7, SOFFIT.h, { all: M.blackMatte }, { cast: false }));
   });
   // study: sliding door rail soffit (CH+229) and bookcase soffit (CH+244)
-  drop([610, 0, 640, 357], 229, 270);
+  drop([610, 0, 640, 357], 229, 270, M.paintSage);
   drop([610, 296, 862, 357], 244, 270);
   // bedroom: wardrobe-side drop (立板 CH+247)
   drop([160, 0, 252, 10], 247, 270);
+  // ceiling panel reveals (天花板分割線) in the living room
+  [[330, 25, 330.5, 325], [560, 25, 560.5, 325]].forEach((r) => groups.ceilings.add(box(r[0], r[1], r[2], r[3], 279.4, 280, { all: M.blackMatte }, { cast: false })));
+  groups.ceilings.add(box(330.5, 175, 560, 175.5, 279.4, 280, { all: M.blackMatte }, { cast: false }));
   // slab
   const slab = box(-200, -100, 930, 600, SLAB, SLAB + 22, { all: M.slabConcrete, b: M.slabConcrete }, { cast: true });
   groups.ceilings.add(slab);
@@ -195,7 +194,7 @@ export function buildArchitecture(M) {
   // -------------------------------------------------------------------------------------------
   // windows
   // -------------------------------------------------------------------------------------------
-  function windowUnit({ axis, a, b, c, depth = 15, sill, head, panels = 3, group, frameMat = M.aluminumWhite }) {
+  function windowUnit({ axis, a, b, c, depth = 15, sill, head, panels = 3, group, frameMat = M.blackMetal }) {
     const len = b - a, h = head - sill, g = new THREE.Group();
     const fb = 4.2, fd = 8;
     const add = (w, d, hh, x, z, y, mat) => { const m = cbox(w, d, hh, mat); m.position.set(x * CM, y * CM, z * CM); g.add(m); return m; };
@@ -217,18 +216,18 @@ export function buildArchitecture(M) {
       add(1.2, 1.6, 6, x + (i % 2 ? -1 : 1) * (pw / 2 - sw - 1.2), z + (i % 2 ? 1.6 : -1.6), fb + sh * 0.55, M.blackMetal);
     }
     // sill / stool
-    add(len + 4, depth + 3, 2.2, 0, 0, -1.1, M.laminateWhite);
+    if (sill > 20) add(len + 4, depth + 3, 2.2, 0, 0, -1.1, M.laminateWhite);
     g.position.set((axis === 'x' ? (a + b) / 2 : c) * CM, sill * CM, (axis === 'x' ? c : (a + b) / 2) * CM);
     if (axis === 'y') g.rotation.y = -Math.PI / 2;
     g.traverse((o) => { if (o.isMesh) { o.castShadow = o.material !== M.glass; o.receiveShadow = true; } });
     group.add(g);
     return g;
   }
-  windowUnit({ axis: 'x', a: -152, b: 122, c: -7.5, sill: 90, head: 225, panels: 3, group: groups.N });
-  windowUnit({ axis: 'x', a: 272, b: 588, c: -7.5, sill: 90, head: 225, panels: 3, group: groups.N });
-  windowUnit({ axis: 'x', a: 715, b: 858, c: -7.5, sill: 90, head: 225, panels: 2, group: groups.N });
-  windowUnit({ axis: 'y', a: 64, b: 190, c: -164.5, sill: 90, head: 225, panels: 2, group: groups.W });
-  windowUnit({ axis: 'y', a: 372, b: 560, c: -185.5, sill: 90, head: 222, panels: 2, group: groups.W });
+  windowUnit({ axis: 'x', a: -152, b: 122, c: -7.5, sill: 4, head: 238, panels: 3, group: groups.N });
+  windowUnit({ axis: 'x', a: 272, b: 588, c: -7.5, sill: 4, head: 258, panels: 4, group: groups.N });
+  windowUnit({ axis: 'x', a: 715, b: 858, c: -7.5, sill: 14, head: 228, panels: 2, group: groups.N });
+  windowUnit({ axis: 'y', a: 64, b: 190, c: -164.5, sill: 4, head: 238, panels: 2, group: groups.W });
+  windowUnit({ axis: 'y', a: 372, b: 560, c: -185.5, sill: 90, head: 222, panels: 2, group: groups.W, frameMat: M.aluminumWhite });
 
   // -------------------------------------------------------------------------------------------
   // doors
@@ -278,42 +277,42 @@ export function buildArchitecture(M) {
     leaf.add(m); return m;
   };
 
-  // bedroom door (hinged north end, opens into the bedroom, painted like the 司曼特 wall, cat flap at the bottom)
+  // bedroom door: oak leaf with a black handle (matches the dark TV wall)
   swingDoor({
     id: 'door-bedroom', name: '主臥門', hinge: [257, 5], width: 90, closed: 90, open: 180, collider: [252, 5, 262, 95],
     build(leaf, { width, height, thick }) {
-      leafBox(leaf, width, height, thick, M.wallPlaster);
-      // cat flap 30x30 (電視牆立面圖：搖擺門)
-      const fr = leafBox(leaf, 34, 34, thick + 0.8, M.blackMatte, width - 46, 4, 0);
-      const fl = leafBox(leaf, 29, 29, 0.6, M.glassTint, width - 43.5, 6.5, 0);
-      const h = cbox(10, 2, 1.4, M.blackMetal); h.position.set((width - 8) * CM, 100 * CM, thick * 0.9 * CM); leaf.add(h);
-      const h2 = cbox(10, 2, 1.4, M.blackMetal); h2.position.set((width - 8) * CM, 100 * CM, -thick * 0.9 * CM); leaf.add(h2);
+      leafBox(leaf, width, height, thick, M.oak);
+      const h = cbox(2, 12, 2, M.blackMetal); h.position.set((width - 7) * CM, 100 * CM, (thick / 2 + 1) * CM); leaf.add(h);
+      const h2 = h.clone(); h2.position.z = -h.position.z; leaf.add(h2);
     },
   });
 
-  // bath door (black frame, laminate + glass strip, horizontal black handle)
+  // bath door: black frame, oak panels and a ribbed-glass strip, black bar handle
   swingDoor({
     id: 'door-bath', name: '衛浴門', hinge: [604, 377], width: 87.6, closed: 90, open: 0, collider: [598, 377, 610, 465],
     build(leaf, { width, height, thick }) {
-      leafBox(leaf, width, height, thick, M.laminateWarm);
+      leafBox(leaf, width, height, thick, M.oak);
       leafBox(leaf, 3.2, height, thick + 0.6, M.blackMetal, 0);
       leafBox(leaf, 3.2, height, thick + 0.6, M.blackMetal, width - 3.2);
       leafBox(leaf, width, 3.2, thick + 0.6, M.blackMetal, 0, height - 3.2);
       leafBox(leaf, width, 3.2, thick + 0.6, M.blackMetal, 0, 0);
-      leafBox(leaf, 20, height - 40, thick + 0.4, M.glassTint, width - 30, 20);
-      const hd = cbox(30, 2.4, 2.4, M.blackMetal); hd.position.set((width - 38) * CM, 100 * CM, (thick + 3) * CM / 2 + 1.5 * CM); leaf.add(hd);
+      leafBox(leaf, 2.6, height - 6, thick + 0.4, M.blackMetal, width * 0.43);
+      leafBox(leaf, 2.6, height - 6, thick + 0.4, M.blackMetal, width * 0.43 + 17);
+      leafBox(leaf, 14.4, height - 8, thick + 0.2, M.glassRibbed, width * 0.43 + 2.6, 4);
+      const hd = cbox(30, 2.4, 2.4, M.blackMetal); hd.position.set((width - 12) * CM, 100 * CM, (thick + 3) * CM / 2 + 1.5 * CM); leaf.add(hd);
       const hd2 = hd.clone(); hd2.position.z = -hd.position.z; leaf.add(hd2);
     },
   });
 
-  // entry door (dark steel, horizontal grooves, smart lock)
+  // entry door: deep plum panel with a recessed grid, smart lock
   swingDoor({
     id: 'door-entry', name: '玄關大門', hinge: [574, 592], width: 108, height: 218, thick: 5, closed: 180, open: 255, collider: [462, 585, 574, 600],
     build(leaf, { width, height, thick }) {
-      leafBox(leaf, width, height, thick, M.laminateGrey);
-      for (let z = 24; z < height - 10; z += 24) leafBox(leaf, width - 6, 0.8, thick + 0.6, M.blackMatte, 3, z);
+      leafBox(leaf, width, height, thick, M.plum);
+      for (let z = 20; z < height - 10; z += 20) leafBox(leaf, width - 6, 0.7, thick + 0.5, M.plumLine, 3, z);
+      for (let x = 20; x < width - 6; x += 20) leafBox(leaf, 0.7, height - 8, thick + 0.5, M.plumLine, x, 4);
       leafBox(leaf, 6, 64, thick + 3, M.blackMetal, width - 14, 92);
-      const lock = leafBox(leaf, 8, 26, thick + 1.6, M.blackMetal, width - 13, 120);
+      leafBox(leaf, 8, 26, thick + 1.6, M.blackMetal, width - 13, 120);
       const hd = cbox(2.4, 2.4, 70, M.chrome); hd.position.set((width - 11) * CM, 96 * CM, (thick / 2 + 4.2) * CM); leaf.add(hd);
     },
   });
@@ -412,7 +411,7 @@ export function buildArchitecture(M) {
   // door frames (casings) -------------------------------------------------------------------
   const casing = (x0, y0, x1, y1, z1, mat, group = groups.walls) => group.add(box(x0, y0, x1, y1, 0, z1, { all: mat }, { cast: false }));
   // bedroom door frame on living side, bath door frame (black), entry frame
-  casing(261.4, 3, 262.6, 5, 219, M.wallPlaster); casing(261.4, 95, 262.6, 97, 219, M.wallPlaster);
+  casing(261.4, 3, 262.6, 5, 219, M.blackMatte); casing(261.4, 95, 262.6, 97, 219, M.blackMatte);
   casing(603.6, 375, 612, 377, 216, M.blackMetal); casing(603.6, 465, 612, 467, 216, M.blackMetal); groups.walls.add(box(603.6, 375, 612, 467, 215, 217, { all: M.blackMetal }, { cast: false }));
   casing(460, 585, 574.5, 587, 223, M.blackMatte);
 

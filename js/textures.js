@@ -92,15 +92,15 @@ export function tile120() {
       const m = fbm(n1, (x / S) * 5 + off, (y / S) * 5 + off, 4);
       const v = fbm(n2, (x / S) * 22 + off, (y / S) * 22 - off, 2);
       // concrete-look: cloudy mottling + fine speckle
-      const cloud = (m - 0.5) * 46;
-      const speck = (v - 0.5) * 16;
-      let r = 190 + cloud + speck, g = 186 + cloud + speck, b = 178 + cloud * 0.9 + speck;
+      const cloud = (m - 0.5) * 15;
+      const speck = (v - 0.5) * 6;
+      let r = 218 + cloud + speck, g = 210 + cloud + speck, b = 195 + cloud * 0.9 + speck;
       let bump = 128 + cloud * 0.5 + speck;
       // grout lines (2.5 mm)
       const lx = x % half, ly = y % half;
       const dEdge = Math.min(lx, half - lx, ly, half - ly);
-      if (dEdge < 1.6 || lx < 1.2 || ly < 1.2) { r = 148; g = 144; b = 138; bump = 40; }
-      else if (dEdge < 3) { const k = (dEdge - 1.6) / 1.4; r -= (1 - k) * 14; g -= (1 - k) * 14; b -= (1 - k) * 14; bump -= (1 - k) * 30; }
+      if (dEdge < 1.6 || lx < 1.2 || ly < 1.2) { r = 206; g = 200; b = 190; bump = 40; }
+      else if (dEdge < 3) { const k = (dEdge - 1.6) / 1.4; r -= (1 - k) * 9; g -= (1 - k) * 9; b -= (1 - k) * 9; bump -= (1 - k) * 30; }
       const i = (y * S + x) * 4;
       img.data[i] = clamp255(r); img.data[i + 1] = clamp255(g); img.data[i + 2] = clamp255(b); img.data[i + 3] = 255;
       const bb = clamp255(bump);
@@ -196,11 +196,11 @@ export function hexTile() {
   const cvs = mk(cw, ch), c = cvs.getContext('2d');
   const bmp = mk(cw, ch), b = bmp.getContext('2d');
   const r = mulberry32(77), n = makeNoise(31, 32);
-  const pal = [[236, 233, 226, 0.40], [208, 206, 200, 0.28], [158, 156, 152, 0.20], [92, 92, 95, 0.12]];
+  const pal = [[178, 164, 148, 0.30], [150, 138, 124, 0.26], [120, 110, 100, 0.22], [94, 88, 82, 0.14], [198, 188, 174, 0.08]];
   const pick = () => { let t = r(), a = 0; for (const p of pal) { a += p[3]; if (t <= a) return p; } return pal[0]; };
   const colors = [];
   for (let i = 0; i < ROWS * COLS; i++) colors.push(pick());
-  c.fillStyle = '#8b8984'; c.fillRect(0, 0, cw, ch);
+  c.fillStyle = '#7d766d'; c.fillRect(0, 0, cw, ch);
   b.fillStyle = '#202020'; b.fillRect(0, 0, cw, ch);
   const rad = R * PPM - 2.2; // minus half grout
   const path = (ctx, cx, cy) => {

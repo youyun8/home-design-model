@@ -1,8 +1,7 @@
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { CM, box, cbox } from './core.js';
-import { rbox, bx, led, curtain, plant, rng, hangingClothes, books } from './furn-common.js';
-import { acUnit } from './furn-rooms-a.js';
+import { rbox, bx, led, curtain, plant, rng } from './furn-common.js';
 
 const S = (m, c = true, r = true) => { m.castShadow = c; m.receiveShadow = r; return m; };
 const tube = (pts, radius, mat, seg = 40) => {
@@ -100,115 +99,6 @@ function fridge(M, cx, cy) {
   [[0, 3], [-34.3, 0]].forEach(() => {});
   g.add(bx(cx - 33, cy - 37, cx - 31.2, cy - 34, 120, 160, { all: M.stainless }));
   g.add(bx(cx - 33, cy - 37, cx - 31.2, cy - 34, 22, 52, { all: M.stainless }));
-  return g;
-}
-
-// =================================================================================================
-// 書房 (x 610..862, y 0..357, raised floor +14, ceiling 270)
-// =================================================================================================
-export function buildStudy(M, ctx) {
-  const g = new THREE.Group();
-  g.name = 'study-furniture';
-  const F = 14; // raised floor
-  // ---- desk 190 x 70, top at 75 (relative to the raised floor)
-  const dx0 = 661, dx1 = 851, dy0 = 151, dy1 = 221;
-  g.add(bx(dx0, dy0, dx1, dy1, F + 71, F + 75, { all: M.oak }));
-  [dx0 + 6, dx1 - 8].forEach((x) => {
-    g.add(bx(x, dy0 + 4, x + 2.4, dy1 - 4, F, F + 71, { all: M.blackMetal }));
-    g.add(bx(x - 8, dy0 + 2, x + 10, dy0 + 4, F, F + 2, { all: M.blackMetal }, { cast: false }));
-  });
-  g.add(bx(dx0 + 8, dy1 - 10, dx1 - 10, dy1 - 8, F + 60, F + 62, { all: M.blackMetal }));
-  // laptop, tablet, notebooks, mug
-  const lap = new THREE.Group();
-  lap.add(S(rbox(0, 0, 32, 22, 0, 1.6, M.steel, 0.6, 2)));
-  const scr = S(rbox(0, -10.5, 32, 0.9, 1.4, 21.8, M.blackMetal, 0.4, 2));
-  scr.rotation.x = -0.28; scr.position.y = 0.5 * CM; lap.add(scr);
-  lap.position.set(708 * CM, (F + 75) * CM, 188 * CM); lap.rotation.y = Math.PI; g.add(lap);
-  g.add(S(rbox(760, 200, 21, 29, F + 75, F + 76.4, M.paper, 0.3, 2)));
-  g.add(S(rbox(782, 196, 16, 22, F + 75, F + 77.2, M.leather, 0.5, 2)));
-  const mug = S(new THREE.Mesh(new THREE.CylinderGeometry(3.6 * CM, 3.2 * CM, 9 * CM, 18), M.ceramic));
-  mug.position.set(738 * CM, (F + 79.5) * CM, 208 * CM); g.add(mug);
-  // desk lamp (arm lamp, plan shows round shade)
-  g.add(deskLamp(M, 668, 185, F + 75, ctx));
-  // chair facing the desk (north)
-  g.add(officeChair(M, 745, 252, F));
-  ctx.colliders.push([660, 150, 852, 222], [720, 228, 772, 276]);
-
-  // ---- bookcase / wardrobe along the south wall (A4)
-  const BY0 = 297, BY1 = 357, top = F + 244 - 14;
-  g.add(bx(611, 355, 862, 357, F, F + 230, { all: M.laminateWhite }));
-  g.add(bx(611, BY0, 613, 357, F, F + 230, { all: M.laminateWhite }));
-  g.add(bx(860, BY0, 862, 357, F, F + 230, { all: M.laminateWhite }));
-  g.add(bx(611, BY0 + 2, 862, 357, F, F + 2.5, { all: M.shadowGap }, { cast: false }));
-  // open shelving section x 700..862
-  const shelfZ = [75, 120, 159, 198, 229].map((z) => z + F);
-  shelfZ.forEach((z, i) => {
-    g.add(bx(700, BY0, 861, 357, z, z + 2.2, { all: M.laminateWhite }));
-    g.add(bx(700, BY0 - 1.2, 861, BY0, z, z + 3.2, { all: M.aluminumWhite }));     // 前緣 3CM 嵌鋁條
-    if (i < 4) g.add(led(M, 702, BY0 + 1.5, 859, BY0 + 1.5, z - 1.5, 1.2));
-  });
-  [700, 748.5, 802, 860.4].forEach((x) => g.add(bx(x, BY0 + 6, x + 1.8, 357, F, F + 231, { all: M.laminateWhite })));
-  // books / objects
-  const bookRows = [[shelfZ[0], 28, 3], [shelfZ[1], 31, 4], [shelfZ[2], 32, 5], [shelfZ[3], 24, 6]];
-  bookRows.forEach(([z, h, seed], i) => {
-    g.add(books(M, i % 2 ? 752 : 706, i % 2 ? 858 : 800, 330, z + 2.2, h, seed));
-  });
-  g.add(S(rbox(830, 330, 10, 10, shelfZ[3] + 2.2, shelfZ[3] + 18, M.ceramic, 2, 3)));
-  g.add(S(rbox(718, 330, 18, 16, shelfZ[4] + 2.2, shelfZ[4] + 4.2, M.oak, 1, 2)));
-  // lower doors (x 700..862)
-  [[701.8, 748], [750.3, 801.6], [803.8, 860]].forEach(([a, b]) => {
-    g.add(bx(a, BY0 - 1.6, b, BY0, F + 2.7, F + 74.4, { all: M.laminateWarm }));
-    g.add(bx(b - 7, BY0 - 2.4, b - 5.8, BY0 - 1.6, F + 52, F + 70, { all: M.blackMetal }, { cast: false }));
-  });
-  // wardrobe section x 611..700 (hanging area + 3 drawers)
-  g.add(bx(611, 350, 700, 357, F + 214, F + 216, { all: M.laminateWhite }));
-  g.add(bx(612, 335, 698, 336.6, F + 211, F + 212.6, { all: M.chrome }, { cast: false }));
-  g.add(hangingClothes(M, 614, 696, 333, F + 211, 13, 'x'));
-  for (let i = 0; i < 3; i++) g.add(bx(613, BY0 - 1.8, 699, BY0, F + 2.7 + i * 25.4, F + 2.7 + (i + 1) * 25.4 - 0.8, { all: M.oak }));
-  [[613, 655.5], [656.5, 699]].forEach(([a, b], i) => g.add(bx(a, BY0 - 1.8, b, BY0, F + 78, F + 232, { all: M.oak })));
-  [[653, 654.2], [657.4, 658.6]].forEach(([a, b]) => g.add(bx(a, BY0 - 2.6, b, BY0 - 1.8, F + 130, F + 160, { all: M.blackMetal }, { cast: false })));
-  ctx.colliders.push([611, 296, 862, 357]);
-
-  // ---- climate + soft furnishing
-  g.add(acUnit(M, 768, 14, 85, F + 208, false));
-  g.add(curtain(M, { axis: 'x', a: 715, b: 858, c: 6, zTop: F + 232, zBottom: F + 2, panelW: 52 }));
-  g.add(plant(M, 628, 250, { h: 125, pot: 16, seed: 71 }));
-  ctx.colliders.push([612, 236, 646, 268]);
-  // folding-door LED slot
-  g.add(led(M, 641, 8, 641, 270, 228, 1.4));
-  return g;
-}
-
-function deskLamp(M, x, y, z, ctx) {
-  const g = new THREE.Group();
-  const base = S(new THREE.Mesh(new THREE.CylinderGeometry(7 * CM, 7.4 * CM, 1.6 * CM, 28), M.blackMetal));
-  base.position.set(x * CM, (z + 0.8) * CM, y * CM); g.add(base);
-  g.add(tube([[x, y, z + 1.6], [x + 1, y, z + 24], [x + 14, y - 2, z + 40], [x + 40, y + 2, z + 44], [x + 66, y + 4, z + 38]], 0.55, M.blackMetal, 30));
-  const shade = S(new THREE.Mesh(new THREE.SphereGeometry(9.5 * CM, 28, 14, 0, Math.PI * 2, 0, Math.PI * 0.55), M.lampShade.clone()));
-  shade.material.emissive = new THREE.Color(0xffe2b0); shade.material.emissiveIntensity = 0; shade.userData.lamp = true;
-  shade.position.set((x + 70) * CM, (z + 40) * CM, (y + 4) * CM); shade.rotation.z = Math.PI + 0.12; g.add(shade);
-  ctx.lamps.push(shade);
-  return g;
-}
-
-function officeChair(M, x, y, z) {
-  const g = new THREE.Group();
-  const rot = new THREE.Group();
-  const seat = S(rbox(0, 0, 48, 47, 44, 52, M.fabricGrey, 5, 4));
-  rot.add(seat);
-  const back = S(rbox(0, 22, 44, 7, 52, 98, M.fabricGrey, 4, 4)); back.rotation.x = -0.12; rot.add(back);
-  const post = S(new THREE.Mesh(new THREE.CylinderGeometry(2.4 * CM, 2.4 * CM, 28 * CM, 12), M.blackMetal));
-  post.position.y = 30 * CM; rot.add(post);
-  for (let i = 0; i < 5; i++) {
-    const a = (i / 5) * Math.PI * 2;
-    const arm = S(new THREE.Mesh(new THREE.BoxGeometry(3 * CM, 2.4 * CM, 28 * CM), M.blackMetal));
-    arm.position.set(Math.sin(a) * 14 * CM, 16 * CM, Math.cos(a) * 14 * CM); arm.rotation.y = a; rot.add(arm);
-    const w = S(new THREE.Mesh(new THREE.SphereGeometry(2.6 * CM, 10, 8), M.rubber));
-    w.position.set(Math.sin(a) * 27 * CM, 3 * CM, Math.cos(a) * 27 * CM); rot.add(w);
-  }
-  rot.rotation.y = Math.PI + 0.18;
-  g.add(rot);
-  g.position.set(x * CM, z * CM, y * CM);
   return g;
 }
 

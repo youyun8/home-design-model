@@ -1,13 +1,17 @@
 import * as THREE from 'three';
 import { addExtraMaterials } from './furn-common.js';
-import { buildBedroom, buildLiving } from './furn-rooms-a.js';
-import { buildKitchen, buildStudy, buildBath, buildBalcony } from './furn-rooms-b.js';
+import { buildBedroom } from './furn-bedroom.js';
+import { buildLiving } from './furn-living.js';
+import { buildStudy } from './furn-study.js';
+import { buildKitchen, buildBath, buildBalcony } from './furn-rooms-b.js';
+import { addDecorMaterials } from './decor.js';
 import { buildDispenserSystem } from './dispenser.js';
 
 /** Adds furniture, cabinetry and the water dispenser system to the scene. */
 export default async function addExtras(app, progress) {
   const { M, scene, arch } = app;
   addExtraMaterials(M);
+  addDecorMaterials(M);
   const tick = () => new Promise((r) => setTimeout(r, 0));
   const ctx = { colliders: arch.colliders, lamps: [], tv: null };
   const furniture = new THREE.Group();

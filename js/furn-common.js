@@ -170,6 +170,7 @@ export function labelPlane(canvasTex, w, h, opts = {}) {
 export function addExtraMaterials(M) {
   const std = (o) => new THREE.MeshStandardMaterial(o);
   M.curtain = new THREE.MeshStandardMaterial({ color: 0xf3efe7, transparent: true, opacity: 0.62, roughness: 0.95, side: THREE.DoubleSide, depthWrite: false });
+  M.curtainGrey = new THREE.MeshStandardMaterial({ color: 0xb4b3b0, transparent: true, opacity: 0.58, roughness: 0.95, side: THREE.DoubleSide, depthWrite: false });
   M.potCeramic = std({ color: 0xd9d3c8, roughness: 0.6 });
   M.soil = std({ color: 0x3b2f27, roughness: 1 });
   M.stem = std({ color: 0x6a5a45, roughness: 0.9 });

@@ -16,7 +16,7 @@ export async function buildMaterials(onProgress = () => {}) {
     M.floorTile = std({ map: t.map, bumpMap: t.bump, bumpScale: 1.2, roughness: 0.42, metalness: 0, envMapIntensity: 0.7 });
   });
   step('木地板', () => {
-    const t = T.woodPlanks({});
+    const t = T.woodPlanks({ hue: 36, sat: 0.40, light: 0.79 });
     M.floorWood = std({ map: t.map, bumpMap: t.bump, bumpScale: 1.5, roughness: 0.55, metalness: 0, envMapIntensity: 0.5 });
   });
   step('六角磚', () => {
@@ -42,9 +42,9 @@ export async function buildMaterials(onProgress = () => {}) {
 
   // ---- walls -----------------------------------------------------------------------------
   step('司曼特塗料', () => {
-    const t = T.plaster({});
+    const t = T.plaster({ base: [112, 111, 107], seed: 8, amp: 20, scale: 2.0 });
     M.wallPlaster = std({ map: t.map, bumpMap: t.bump, bumpScale: 0.5, roughness: 0.9, envMapIntensity: 0.4 });
-    const w = T.plaster({ base: [236, 233, 227], seed: 4, amp: 4, scale: 2.4 });
+    const w = T.plaster({ base: [233, 219, 211], seed: 4, amp: 3, scale: 2.4 }); // 玫瑰白
     M.wallWhite = std({ map: w.map, bumpMap: w.bump, bumpScale: 0.12, roughness: 0.95, envMapIntensity: 0.4 });
     M.ceilingWhite = std({ color: 0xf4f2ee, roughness: 0.95, envMapIntensity: 0.3 });
     M.slabConcrete = std({ color: 0x9a9b9c, roughness: 1 });
@@ -59,7 +59,7 @@ export async function buildMaterials(onProgress = () => {}) {
 
   // ---- wood, laminate, stone, metals ------------------------------------------------------
   step('木皮與櫃體', () => {
-    const v = T.veneer({});
+    const v = T.veneer({ hue: 34, sat: 0.42, light: 0.72 });
     M.oak = std({ map: v.map, roughness: 0.5, envMapIntensity: 0.5 });
     const v2 = T.veneer({ hue: 28, sat: 0.35, light: 0.52, seed: 14 });
     M.oakDark = std({ map: v2.map, roughness: 0.5, envMapIntensity: 0.5 });
@@ -70,6 +70,12 @@ export async function buildMaterials(onProgress = () => {}) {
     M.quartz = phys({ color: 0xe9e6e0, roughness: 0.28, clearcoat: 0.2, clearcoatRoughness: 0.3, envMapIntensity: 0.9 });
     M.blackMetal = std({ color: 0x161617, roughness: 0.42, metalness: 0.7, envMapIntensity: 1 });
     M.blackMatte = std({ color: 0x1b1b1c, roughness: 0.7, metalness: 0.2 });
+    M.plum = std({ color: 0x4a3140, roughness: 0.5, metalness: 0.1, envMapIntensity: 0.6 });
+    M.plumLine = std({ color: 0x32202b, roughness: 0.6 });
+    M.charcoal = std({ color: 0x38332f, roughness: 0.85 });
+    M.blackCabinet = std({ color: 0x1d1d1f, roughness: 0.62, envMapIntensity: 0.6 });
+    M.mirrorDark = std({ color: 0x3a383d, roughness: 0.05, metalness: 1, envMapIntensity: 1.5 });
+    M.paintSage = std({ color: 0x7c8668, roughness: 0.9 });
     M.bronze = std({ color: 0x6b5a45, roughness: 0.35, metalness: 0.85, envMapIntensity: 1.1 });
     M.steel = std({ color: 0xc8cbcf, roughness: 0.28, metalness: 1, envMapIntensity: 1.2 });
     M.chrome = std({ color: 0xffffff, roughness: 0.06, metalness: 1, envMapIntensity: 1.4 });
