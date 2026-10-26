@@ -34,13 +34,13 @@ export async function buildMaterials(onProgress = () => {}) {
   });
   step('陽台', () => {
     // 照片：深灰長條磚牆、淺灰長條磚牆、鋁條天花、淺灰地磚
-    const bd = T.stickBrick({ base: [74, 73, 72], grout: [92, 92, 90], var_: 12 });
+    const bd = T.stickBrick({ base: [74, 73, 72], grout: [244, 242, 238], var_: 12 });
     M.brickDark = std({ map: bd.map, bumpMap: bd.bump, bumpScale: 1.6, roughness: 0.7, envMapIntensity: 0.5 });
-    const bl = T.stickBrick({ base: [196, 196, 193], grout: [128, 126, 122], var_: 7, ridged: false, seed: 9 });
+    const bl = T.stickBrick({ base: [196, 196, 193], grout: [244, 242, 238], var_: 7, ridged: false, seed: 9 });
     M.brickLight = std({ map: bl.map, bumpMap: bl.bump, bumpScale: 1.2, roughness: 0.5, envMapIntensity: 0.6 });
     const sc = T.slatCeiling();
     M.alumCeiling = std({ map: sc.map, roughness: 0.45, metalness: 0.35, envMapIntensity: 0.9 });
-    const bf = T.speckleTile({ tw: 0.3, th: 0.3, cols: 4, rows: 4, base: [196, 195, 191], speck: [[222, 221, 216], [168, 166, 160], [180, 178, 172]], grout: [138, 136, 132], gw: 0.004, density: 4200, seed: 41 });
+    const bf = T.speckleTile({ tw: 0.3, th: 0.3, cols: 4, rows: 4, base: [196, 195, 191], speck: [[222, 221, 216], [168, 166, 160], [180, 178, 172]], grout: [244, 242, 238], gw: 0.004, density: 4200, seed: 41 });
     M.floorBalcony = std({ map: bf.map, bumpMap: bf.bump, bumpScale: 0.5, roughness: 0.62, envMapIntensity: 0.6 });
     M.railing = std({ color: 0x4b4e53, roughness: 0.45, metalness: 0.7, envMapIntensity: 1.0 });
     M.louvre = std({ color: 0x8e9195, roughness: 0.38, metalness: 0.75, envMapIntensity: 1.1 });

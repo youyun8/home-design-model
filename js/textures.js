@@ -99,7 +99,7 @@ export function tile120() {
       // grout lines (2.5 mm)
       const lx = x % half, ly = y % half;
       const dEdge = Math.min(lx, half - lx, ly, half - ly);
-      if (dEdge < 1.6 || lx < 1.2 || ly < 1.2) { r = 206; g = 200; b = 190; bump = 40; }
+      if (dEdge < 1.6 || lx < 1.2 || ly < 1.2) { r = 244; g = 242; b = 238; bump = 40; }
       else if (dEdge < 3) { const k = (dEdge - 1.6) / 1.4; r -= (1 - k) * 9; g -= (1 - k) * 9; b -= (1 - k) * 9; bump -= (1 - k) * 30; }
       const i = (y * S + x) * 4;
       img.data[i] = clamp255(r); img.data[i + 1] = clamp255(g); img.data[i + 2] = clamp255(b); img.data[i + 3] = 255;
@@ -200,7 +200,7 @@ export function hexTile() {
   const pick = () => { let t = r(), a = 0; for (const p of pal) { a += p[3]; if (t <= a) return p; } return pal[0]; };
   const colors = [];
   for (let i = 0; i < ROWS * COLS; i++) colors.push(pick());
-  c.fillStyle = '#2f3130'; c.fillRect(0, 0, cw, ch);
+  c.fillStyle = '#f4f2ee'; c.fillRect(0, 0, cw, ch);
   b.fillStyle = '#202020'; b.fillRect(0, 0, cw, ch);
   const rad = R * PPM - 2.6; // minus half grout
   const path = (ctx, cx, cy) => {
@@ -232,7 +232,7 @@ export function hexTile() {
 // ---------------------------------------------------------------------------------------------
 // Terrazzo
 // ---------------------------------------------------------------------------------------------
-export function terrazzo({ base = [205, 198, 188], chips, tileW = 0.6, tileH = 0.6, cols = 2, rows = 2, seed = 3, density = 2600, grout = [176, 170, 162], chipScale = 1 } = {}) {
+export function terrazzo({ base = [205, 198, 188], chips, tileW = 0.6, tileH = 0.6, cols = 2, rows = 2, seed = 3, density = 2600, grout = [244, 242, 238], chipScale = 1 } = {}) {
   const sizeW = tileW * cols, sizeH = tileH * rows;
   const S = 1024, W = S, H = Math.round(S * sizeH / sizeW);
   const cvs = mk(W, H), c = cvs.getContext('2d');
@@ -300,7 +300,7 @@ export function plaster({ base = [214, 209, 201], seed = 8, amp = 16, scale = 2.
 // ---------------------------------------------------------------------------------------------
 // Kitchen wall tile 30 x 60 cm, running bond. Canvas 0.6 x 0.6 m
 // ---------------------------------------------------------------------------------------------
-export function wallTile({ base = [232, 229, 221], w = 0.6, h = 0.3, seed = 4, grout = [196, 192, 184] } = {}) {
+export function wallTile({ base = [232, 229, 221], w = 0.6, h = 0.3, seed = 4, grout = [244, 242, 238] } = {}) {
   const S = 512, cvs = mk(S, S), c = cvs.getContext('2d');
   const bmp = mk(S, S), b = bmp.getContext('2d');
   const r = mulberry32(seed);
@@ -390,7 +390,7 @@ export function bathWallTile({ seed = 31 } = {}) {
     c.beginPath(); c.ellipse(x, y, rad, rad * (0.6 + r() * 0.5), r() * 6.28, 0, 6.28); c.fill();
   }
   // joints: two 60 cm columns, one 120 cm row
-  c.fillStyle = 'rgba(184,174,158,0.9)';
+  c.fillStyle = 'rgba(246,244,240,0.95)';
   for (let k = 0; k <= 2; k++) c.fillRect(k * W / 2 - 1, 0, 2, H);
   c.fillRect(0, H - 1, W, 2); c.fillRect(0, 0, W, 1);
   return { map: toTex(cvs, { repeat: [1 / sizeW, 1 / sizeH] }) };
@@ -420,7 +420,7 @@ export function terrazzoAccent({ seed = 12 } = {}) {
 }
 
 /** Porcelain with fine pale speckles and thin dark joints (bathroom floor 60 x 60). */
-export function speckleTile({ tw = 0.6, th = 0.6, cols = 2, rows = 2, base = [218, 216, 210], speck = [[236, 234, 229], [196, 193, 186], [208, 205, 197]], grout = [58, 58, 60], gw = 0.003, density = 7000, seed = 21 } = {}) {
+export function speckleTile({ tw = 0.6, th = 0.6, cols = 2, rows = 2, base = [218, 216, 210], speck = [[236, 234, 229], [196, 193, 186], [208, 205, 197]], grout = [244, 242, 238], gw = 0.003, density = 7000, seed = 21 } = {}) {
   const sizeW = tw * cols, sizeH = th * rows, W = 1024, H = Math.round(W * sizeH / sizeW), pxm = W / sizeW;
   const cvs = mk(W, H), c = cvs.getContext('2d'), r = mulberry32(seed);
   const n = tileFbm(seed, 4, 4);
@@ -446,7 +446,7 @@ export function speckleTile({ tw = 0.6, th = 0.6, cols = 2, rows = 2, base = [21
 }
 
 /** Narrow "stick" brick tile, running bond (balcony walls). rowH / len in metres. */
-export function stickBrick({ base = [78, 76, 76], grout = [58, 58, 58], rowH = 0.046, len = 0.24, var_ = 16, ridged = true, seed = 5 } = {}) {
+export function stickBrick({ base = [78, 76, 76], grout = [244, 242, 238], rowH = 0.046, len = 0.24, var_ = 16, ridged = true, seed = 5 } = {}) {
   const rows = 6, sizeW = len * 2, sizeH = rowH * rows, ppm = 1800;
   const W = Math.round(sizeW * ppm), H = Math.round(sizeH * ppm), ph = H / rows;
   const cvs = mk(W, H), c = cvs.getContext('2d'), bmp = mk(W, H), b = bmp.getContext('2d'), r = mulberry32(seed);
