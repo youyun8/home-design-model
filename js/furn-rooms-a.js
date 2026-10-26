@@ -158,7 +158,7 @@ export function buildLiving(M, ctx) {
     tv.add(S(rbox(266.4, 212, 3.4, 148, 66, 152.5, M.blackMatte, 0.6, 2)));
     const scr = new THREE.Mesh(new THREE.PlaneGeometry(143 * CM, 81 * CM), M.screenOff);
     scr.rotation.y = Math.PI / 2; scr.position.set(268.2 * CM, 109.8 * CM, 212 * CM);
-    scr.userData.tv = true; tv.add(scr);
+    scr.userData.tv = true; scr.userData.dynamic = true; tv.add(scr);
     tv.add(bx(262, 205, 264.8, 218, 100, 112, { all: M.blackMetal }));
     g.add(tv); ctx.tv = scr;
   }
