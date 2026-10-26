@@ -66,10 +66,10 @@ export function buildBath(M, ctx) {
   g.add(bx(612, 392, 614, 422, 100, 102, { all: M.chrome }));
   g.add(bx(612, 394, 616, 396, 98, 102, { all: M.chrome })); g.add(bx(612, 418, 616, 420, 98, 102, { all: M.chrome }));
   g.add(bx(700, 377, 728, 378.4, 135, 136.6, { all: M.chrome }));
-  // tall colourful terrazzo accent strip (跳色水磨石) on the shower side only: the south wall behind the shower.
+  // tall colourful terrazzo accent strip (跳色水磨石) on the shower side only: the far (east) wall seen from the door.
   // The toilet side stays plain beige-white tile.
-  g.add(bx(828, 584.4, 888, 585, 0, 232, { all: M.wallTerrazzoAccent }, { cast: false }));
-  g.add(bx(827.6, 584.2, 888.4, 585, 232, 233.2, { all: M.chrome }, { cast: false }));            // metal cap trim
+  g.add(bx(913.4, 512, 914, 572, 0, 232, { all: M.wallTerrazzoAccent }, { cast: false }));
+  g.add(bx(913.2, 511.6, 914, 572.4, 232, 233.2, { all: M.chrome }, { cast: false }));            // metal cap trim
   // threshold + exhaust
   g.add(bx(609, 377, 616, 465, 0, 0.6, { all: M.aluminumWhite }, { cast: false }));
   g.add(bx(738, 440, 770, 464, 238.6, 240, { all: M.laminateWhite }, { cast: false }));
@@ -77,12 +77,39 @@ export function buildBath(M, ctx) {
 }
 
 // =================================================================================================
-// 後陽台 — kept empty on purpose: no furniture, appliances or props. Only the metal railing that
-// closes the open side is built here (walls, ceiling, floor and door are in architecture.js).
+// 後陽台 — no furniture or appliances. Only what is part of the building: the vertical aluminium louvre
+// screen, the two ceiling drying rods and the metal railing (walls, ceiling, floor, door: architecture.js).
 // =================================================================================================
 export function buildBalcony(M, ctx) {
   const g = new THREE.Group();
   g.name = 'balcony-furniture';
+  // vertical aluminium louvre screen in front of the heater
+  {
+    const x0 = -92, x1 = -22, y = 374, pitch = 7.8, n = Math.floor((x1 - x0) / pitch);
+    for (let i = 0; i <= n; i++) {
+      const x = x0 + i * pitch;
+      g.add(bx(x, y, x + 5.4, y + 1.8, 2, 234, { all: M.louvre }));
+    }
+    g.add(bx(x0 - 2, y - 1, x1 + 3, y + 3, 0, 2.4, { all: M.louvre }));
+    g.add(bx(x0 - 2, y - 1, x1 + 3, y + 3, 232, 236, { all: M.louvre }));
+    g.add(bx(x0 - 3, y - 1, x0 - 1, y + 3, 0, 236, { all: M.louvre }));
+    g.add(bx(x1 + 1, y - 1, x1 + 3, y + 3, 0, 236, { all: M.louvre }));
+    ctx.colliders.push([x0 - 4, y - 2, x1 + 4, y + 4]);
+  }
+
+  // ceiling-hung drying rods (two) with cords and a cleat on the dark wall
+  [-128, -102].forEach((x) => {
+    const rod = S(new THREE.Mesh(new THREE.CylinderGeometry(1.4 * CM, 1.4 * CM, 150 * CM, 14), M.aluminumWhite));
+    rod.rotation.x = Math.PI / 2; rod.position.set(x * CM, 226 * CM, 440 * CM); g.add(rod);
+    [372, 508].forEach((y) => {
+      const pul = S(new THREE.Mesh(new THREE.CylinderGeometry(3.4 * CM, 3.4 * CM, 1.6 * CM, 20), M.chrome));
+      pul.position.set(x * CM, 235 * CM, y * CM); g.add(pul);
+      g.add(bx(x - 0.15, y - 0.15, x + 0.15, y + 0.15, 226, 235, { all: M.steel }, { cast: false }));
+    });
+    g.add(bx(x - 0.15, 342.4, x + 0.15, 342.8, 134, 234, { all: M.steel }, { cast: false }));
+  });
+  { const cl = S(new THREE.Mesh(new THREE.CylinderGeometry(3.6 * CM, 3.6 * CM, 1.2 * CM, 24), M.chrome)); cl.scale.z = 0.6; cl.rotation.x = Math.PI / 2; cl.position.set(-115 * CM, 130 * CM, 343 * CM); g.add(cl); }
+
   const x = -185.5, ya = 372, yb = 560, h = 105;
   g.add(bx(x - 1.8, ya, x + 1.8, yb, h - 3.4, h, { all: M.railing }));
   g.add(bx(x - 1.8, ya, x + 1.8, yb, 3, 6.6, { all: M.railing }));
