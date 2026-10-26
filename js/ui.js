@@ -43,13 +43,14 @@ export function setupUI(app, nav) {
     lighting.setTime(b.dataset.time); setSeg(timeSeg, 'time', b.dataset.time); syncLights();
   });
   lightsBtn.addEventListener('click', () => { lighting.setLights(!lighting.lightsOn); syncLights(); });
-  const dimsBtn = $('#btn-dims'), dimsEl = $('#dims');
-  const dimLabels = app.dims.labels.map((l) => { const d = document.createElement('div'); d.className = 'dim'; d.textContent = l.text; dimsEl.appendChild(d); return { d, ...l }; });
+  const dimsBtn = $('#btn-dims'), dimsEl = $('#dims'), dimsPanel = $('#dims-panel'), D = app.dims;
+  const dimLabels = D.labels.map((l) => { const d = document.createElement('div'); d.className = `dim ${l.src}`; d.textContent = l.text; dimsEl.appendChild(d); return { d, ...l }; });
   dimsEl.style.display = 'none';
   dimsBtn.addEventListener('click', () => {
-    const on = dimsBtn.getAttribute('aria-pressed') !== 'true';
-    dimsBtn.setAttribute('aria-pressed', String(on)); app.dims.group.visible = on; dimsEl.style.display = on ? '' : 'none';
+    D.state.on = dimsBtn.getAttribute('aria-pressed') !== 'true';
+    dimsBtn.setAttribute('aria-pressed', String(D.state.on)); dimsEl.style.display = D.state.on ? '' : 'none'; dimsPanel.hidden = !D.state.on; D.apply();
   });
+  dimsPanel.addEventListener('change', (e) => { const c = e.target; if (c.dataset.cat) D.state.cat[c.dataset.cat] = c.checked; if (c.dataset.src) D.state.src[c.dataset.src] = c.checked; D.apply(); });
   const curtainBtn = $('#btn-curtain');
   curtainBtn.addEventListener('click', () => app.curtains.toggle());
   app.curtains.onChange = (closed) => { curtainBtn.setAttribute('aria-pressed', String(closed)); curtainBtn.textContent = closed ? '窗簾（已拉上）' : '窗簾'; };
@@ -197,12 +198,12 @@ export function setupUI(app, nav) {
   const dtmp = new THREE.Vector3();
   ui.update = (dt) => {
     ui.updateMinimap(dt);
-    if (app.dims.group.visible) {
+    if (D.state.on) {
       const w = innerWidth, h = innerHeight;
       dimLabels.forEach((l) => {
         dtmp.copy(l.pos).project(app.camera);
         const dist = app.camera.position.distanceTo(l.pos);
-        const ok = dtmp.z < 1 && Math.abs(dtmp.x) < 1.05 && Math.abs(dtmp.y) < 1.05 && (app.nav.mode === 'orbit' || dist < 7);
+        const ok = D.shown(l) && dtmp.z < 1 && Math.abs(dtmp.x) < 1.05 && Math.abs(dtmp.y) < 1.05 && (app.nav.mode === 'orbit' || dist < 7);
         l.d.style.display = ok ? '' : 'none';
         l.d.style.left = `${(dtmp.x * 0.5 + 0.5) * w}px`; l.d.style.top = `${(-dtmp.y * 0.5 + 0.5) * h}px`;
       });

@@ -91,6 +91,13 @@ button, select { font: inherit; color: inherit; }
 #labels { position: fixed; inset: 0; pointer-events: none; z-index: 7; overflow: hidden; }
 #dims { position: fixed; inset: 0; pointer-events: none; z-index: 6; overflow: hidden; }
 #dims .dim { position: absolute; transform: translate(-50%, -50%); background: rgba(6, 40, 48, .9); color: #aef4ff; border: 1px solid rgba(31, 209, 230, .7); font-size: 12px; padding: 2px 7px; border-radius: 5px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+#dims .dim.der { background: rgba(60, 38, 4, .92); color: #ffd48a; border-color: rgba(255, 176, 46, .85); border-style: dashed; }
+#dims-panel { position: fixed; right: 12px; top: 74px; z-index: 12; width: 250px; padding: 10px 12px; font-size: 12.5px; }
+#dims-panel b { font-size: 13px; }
+#dims-panel .row { display: flex; flex-wrap: wrap; gap: 4px 12px; margin: 8px 0; }
+#dims-panel label { display: flex; align-items: center; gap: 5px; cursor: pointer; }
+#dims-panel .k.dwg { color: #aef4ff; } #dims-panel .k.der { color: #ffd48a; }
+#dims-panel p { margin: 4px 0 0; color: var(--muted); font-size: 11.5px; line-height: 1.5; }
 #labels .lbl { position: absolute; transform: translate(-50%, -140%); background: rgba(10, 80, 100, .88); color: #e6fbff; font-size: 12px; padding: 4px 9px; border-radius: 7px; border: 1px solid rgba(120, 220, 240, .6); white-space: nowrap; box-shadow: 0 4px 14px rgba(0, 0, 0, .35); }
 #labels .lbl::after { content: ''; position: absolute; left: 50%; bottom: -5px; width: 8px; height: 8px; background: inherit; border-right: 1px solid rgba(120, 220, 240, .6); border-bottom: 1px solid rgba(120, 220, 240, .6); transform: translateX(-50%) rotate(45deg); }
 

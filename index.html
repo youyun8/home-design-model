@@ -89,6 +89,12 @@
   <div id="tooltip" hidden></div>
   <div id="labels"></div>
   <div id="dims"></div>
+  <div id="dims-panel" class="glass" hidden>
+    <b>尺寸標註（公分）</b>
+    <div class="row"><label><input type="checkbox" data-cat="room" checked> 房間</label><label><input type="checkbox" data-cat="open" checked> 門窗</label><label><input type="checkbox" data-cat="furn" checked> 家具櫃體</label><label><input type="checkbox" data-cat="height" checked> 高度</label></div>
+    <div class="row"><label class="k dwg"><input type="checkbox" data-src="dwg" checked> 青色框：圖面標示</label><label class="k der"><input type="checkbox" data-src="der" checked> 橘色框：推導</label></div>
+    <p>橘色是圖面沒標示、由模型座標、標準尺寸或假設推導出來的數字，需現場確認。</p>
+  </div>
 
   <!-- touch joystick -->
   <div id="joystick" hidden><i></i></div>
