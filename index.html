@@ -39,6 +39,7 @@
         <button data-time="night">夜晚</button>
       </div>
       <button id="btn-lights" class="chip" aria-pressed="false" title="開關全室燈光">燈光</button>
+      <button id="btn-dims" class="chip" aria-pressed="false" title="顯示施工圖尺寸標註（公分）">尺寸</button>
       <button id="btn-curtain" class="chip" aria-pressed="false" title="拉上／拉開遮光窗簾">窗簾</button>
       <button id="btn-ceiling" class="chip" aria-pressed="false" title="環景模式下顯示天花板">天花板</button>
       <label class="sel" title="畫質"><select id="sel-quality" aria-label="畫質"><option value="high">高畫質</option><option value="medium">中</option><option value="low">省電</option></select></label>
@@ -87,6 +88,7 @@
   <div id="toast" role="status" hidden></div>
   <div id="tooltip" hidden></div>
   <div id="labels"></div>
+  <div id="dims"></div>
 
   <!-- touch joystick -->
   <div id="joystick" hidden><i></i></div>

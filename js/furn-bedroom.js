@@ -34,10 +34,10 @@ export function buildBedroom(M, ctx) {
       g.add(softMesh({ w: Math.min(pw - 4, 62), h: 14, d: 38, r: 6, fold: 0.5, pinch: 0.5, crown: 2, seed: i + x0 }, M.bedPillow, x0 + 4 + pw * (i + 0.5), 304, 56, { x: -0.16 }));
     }
   };
-  bed(-155, -52, 1);
-  bed(-50, 100, 2);
-  g.add(nightstand(M, 126, 302));
-  ctx.colliders.push([-157, 140, 100, 333], [104, 284, 148, 324]);
+  bed(-135, -32, 1);
+  bed(-30, 120, 2);
+  g.add(nightstand(M, 146, 302));
+  ctx.colliders.push([-137, 140, 122, 333], [126, 284, 168, 324]);
 
   // ---- wardrobe along the east wall (x 190..250): oak doors with thin black reveals
   {
@@ -62,8 +62,8 @@ export function buildBedroom(M, ctx) {
   g.add(acUnit(M, 241, 54, 90, 226));
 
   // ---- window corner: wood armchair, round table (curtains come from curtains.js)
-  g.add(woodArmchair(M, -118, 84, -Math.PI / 2));
+  g.add(woodArmchair(M, -112, 84, -Math.PI / 2));
   g.add(sideTableRound(M, -58, 62));
-  ctx.colliders.push([-150, 54, -86, 114], [-90, 40, -26, 86]);
+  ctx.colliders.push([-144, 54, -80, 114], [-90, 40, -26, 86]);
   return g;
 }

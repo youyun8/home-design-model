@@ -43,6 +43,13 @@ export function setupUI(app, nav) {
     lighting.setTime(b.dataset.time); setSeg(timeSeg, 'time', b.dataset.time); syncLights();
   });
   lightsBtn.addEventListener('click', () => { lighting.setLights(!lighting.lightsOn); syncLights(); });
+  const dimsBtn = $('#btn-dims'), dimsEl = $('#dims');
+  const dimLabels = app.dims.labels.map((l) => { const d = document.createElement('div'); d.className = 'dim'; d.textContent = l.text; dimsEl.appendChild(d); return { d, ...l }; });
+  dimsEl.style.display = 'none';
+  dimsBtn.addEventListener('click', () => {
+    const on = dimsBtn.getAttribute('aria-pressed') !== 'true';
+    dimsBtn.setAttribute('aria-pressed', String(on)); app.dims.group.visible = on; dimsEl.style.display = on ? '' : 'none';
+  });
   const curtainBtn = $('#btn-curtain');
   curtainBtn.addEventListener('click', () => app.curtains.toggle());
   app.curtains.onChange = (closed) => { curtainBtn.setAttribute('aria-pressed', String(closed)); curtainBtn.textContent = closed ? '窗簾（已拉上）' : '窗簾'; };
@@ -187,8 +194,19 @@ export function setupUI(app, nav) {
   });
 
   // ------------------------------------------------------------------------- per-frame
+  const dtmp = new THREE.Vector3();
   ui.update = (dt) => {
     ui.updateMinimap(dt);
+    if (app.dims.group.visible) {
+      const w = innerWidth, h = innerHeight;
+      dimLabels.forEach((l) => {
+        dtmp.copy(l.pos).project(app.camera);
+        const dist = app.camera.position.distanceTo(l.pos);
+        const ok = dtmp.z < 1 && Math.abs(dtmp.x) < 1.05 && Math.abs(dtmp.y) < 1.05 && (app.nav.mode === 'orbit' || dist < 7);
+        l.d.style.display = ok ? '' : 'none';
+        l.d.style.left = `${(dtmp.x * 0.5 + 0.5) * w}px`; l.d.style.top = `${(-dtmp.y * 0.5 + 0.5) * h}px`;
+      });
+    }
     if (disp.state.xray) {
       const w = innerWidth, h = innerHeight;
       lbls.forEach((l) => {
